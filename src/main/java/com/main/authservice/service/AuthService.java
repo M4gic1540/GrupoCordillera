@@ -16,6 +16,8 @@ import com.main.authservice.security.JwtService;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -53,7 +57,9 @@ public class AuthService {
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         String email = request.getEmail().trim().toLowerCase();
+        logger.info("Register flow started for email={}", email);
         if (userRepository.existsByEmail(email)) {
+            logger.warn("Register rejected, email already exists: {}", email);
             throw new ConflictException("Email already registered");
         }
 
@@ -62,6 +68,7 @@ public class AuthService {
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.USER);
         User savedUser = userRepository.save(user);
+        logger.info("User created with id={} email={}", savedUser.getId(), savedUser.getEmail());
 
         RefreshToken refreshToken = createAndSaveRefreshToken(savedUser);
         return buildAuthResponse(savedUser, refreshToken.getToken());
@@ -70,9 +77,11 @@ public class AuthService {
     @Transactional
     public AuthResponse login(LoginRequest request) {
         String email = request.getEmail().trim().toLowerCase();
+        logger.info("Login flow started for email={}", email);
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.getPassword()));
         } catch (BadCredentialsException ex) {
+            logger.warn("Login failed due to invalid credentials for email={}", email);
             throw new UnauthorizedException("Invalid credentials");
         }
 
@@ -80,17 +89,20 @@ public class AuthService {
                 .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
         refreshTokenRepository.deleteByUser(user);
         RefreshToken refreshToken = createAndSaveRefreshToken(user);
+        logger.info("Login successful for userId={}", user.getId());
         return buildAuthResponse(user, refreshToken.getToken());
     }
 
     @Transactional
     public AuthResponse refresh(RefreshRequest request) {
+        logger.info("Refresh token flow started");
         RefreshToken oldToken = refreshTokenRepository.findByTokenAndRevokedFalse(request.getRefreshToken())
                 .orElseThrow(() -> new UnauthorizedException("Invalid refresh token"));
 
         if (oldToken.getExpiresAt().isBefore(Instant.now())) {
             oldToken.setRevoked(true);
             refreshTokenRepository.save(oldToken);
+            logger.warn("Refresh token rejected, token expired for userId={}", oldToken.getUser().getId());
             throw new UnauthorizedException("Refresh token expired");
         }
 
@@ -99,11 +111,13 @@ public class AuthService {
 
         User user = oldToken.getUser();
         RefreshToken newToken = createAndSaveRefreshToken(user);
+        logger.info("Refresh token successful for userId={}", user.getId());
         return buildAuthResponse(user, newToken.getToken());
     }
 
     @Transactional(readOnly = true)
     public UserMeResponse me(String email) {
+        logger.debug("Fetching profile for email={}", email);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UnauthorizedException("User not found"));
         UserMeResponse response = new UserMeResponse();
