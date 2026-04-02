@@ -4,18 +4,23 @@ import com.main.authservice.dto.AuthResponse;
 import com.main.authservice.dto.LoginRequest;
 import com.main.authservice.dto.RefreshRequest;
 import com.main.authservice.dto.RegisterRequest;
+import com.main.authservice.security.JwtService;
 import com.main.authservice.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -25,9 +30,11 @@ public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final AuthService authService;
+    private final JwtService jwtService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, JwtService jwtService) {
         this.authService = authService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/register")
@@ -55,5 +62,28 @@ public class AuthController {
         AuthResponse response = authService.refresh(request);
         logger.info("Token refresh completed for userId={}", response.getUserId());
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/validate")
+    @Operation(summary = "Validate access token", description = "Validates JWT token for gateway auth request checks.")
+    public ResponseEntity<Void> validateAccessToken(
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization
+    ) {
+        if (!StringUtils.hasText(authorization) || !authorization.startsWith("Bearer ")) {
+            logger.debug("JWT validation rejected: missing bearer header");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String token = authorization.substring(7);
+        try {
+            if (jwtService.isTokenValid(token)) {
+                return ResponseEntity.ok().build();
+            }
+        } catch (Exception ex) {
+            logger.debug("JWT validation rejected: invalid token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }
