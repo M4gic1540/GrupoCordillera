@@ -5,6 +5,8 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.validation.FieldError;
@@ -15,8 +17,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        logger.warn("Validation error in request body: {} field errors", ex.getBindingResult().getFieldErrorCount());
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problemDetail.setTitle("Validation failed");
         problemDetail.setDetail("One or more fields are invalid");
@@ -37,6 +42,7 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ProblemDetail handleConstraintViolation(ConstraintViolationException ex) {
+        logger.warn("Constraint violation: {} violations", ex.getConstraintViolations().size());
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problemDetail.setTitle("Validation failed");
         problemDetail.setDetail(ex.getConstraintViolations().stream()
@@ -48,11 +54,13 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(ConflictException.class)
     public ProblemDetail handleConflict(ConflictException ex) {
+        logger.warn("Conflict handled: {}", ex.getMessage());
         return buildProblem(HttpStatus.CONFLICT, "Conflict", ex.getMessage());
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ProblemDetail handleUnauthorized(UnauthorizedException ex) {
+        logger.warn("Unauthorized handled: {}", ex.getMessage());
         return buildProblem(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage());
     }
 

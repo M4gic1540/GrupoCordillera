@@ -5,6 +5,8 @@ import com.main.authservice.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/users")
 @Tag(name = "Users", description = "Endpoints for authenticated user data")
 public class UserController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private final AuthService authService;
 
@@ -29,6 +33,9 @@ public class UserController {
             security = @SecurityRequirement(name = "bearerAuth")
     )
     public ResponseEntity<UserMeResponse> me(Authentication authentication) {
-        return ResponseEntity.ok(authService.me(authentication.getName()));
+        logger.debug("User profile requested for principal={}", authentication.getName());
+        UserMeResponse response = authService.me(authentication.getName());
+        logger.debug("User profile response generated for userId={}", response.getId());
+        return ResponseEntity.ok(response);
     }
 }
