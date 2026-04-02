@@ -11,16 +11,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-auth_db}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-authservice_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  authservice:
+  authservice-1:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: authservice-app
     depends_on:
       postgres:
         condition: service_healthy
@@ -29,6 +28,32 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-authservice_db}
       DB_USERNAME: ${POSTGRES_USER:-postgres}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    expose:
+      - "8080"
+
+  authservice-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-authservice_db}
+      DB_USERNAME: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    expose:
+      - "8080"
+
+  api-gateway:
+    image: nginx:1.27-alpine
+    container_name: authservice-api-gateway
+    depends_on:
+      - authservice-1
+      - authservice-2
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - "8080:8080"
 
