@@ -54,12 +54,14 @@ pipeline {
                     def sonarUrl = 'http://sonarqube:9000'
                     def sonarToken = 'sqp_31d07692fe508884a1822a2b7de6b83c581cebc6'
                     
-                    sh """
-                        mvn clean verify sonar:sonar \
-                          -Dsonar.projectKey=grupo-cordillera \
-                          -Dsonar.host.url=${sonarUrl} \
-                          -Dsonar.login=${sonarToken}
-                    """
+                    dir('authservice') {
+                        sh """
+                            ./mvnw clean verify sonar:sonar \
+                              -Dsonar.projectKey=grupo-cordillera \
+                              -Dsonar.host.url=${sonarUrl} \
+                              -Dsonar.login=${sonarToken}
+                        """
+                    }
                 }
             }
         }
