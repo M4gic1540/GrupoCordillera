@@ -51,7 +51,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    def sonarUrl = 'http://sonarqube:9000'
+                    def sonarUrl = 'http://localhost:9000'
                     def sonarToken = 'sqp_31d07692fe508884a1822a2b7de6b83c581cebc6'
                     
                     dir('authservice') {
