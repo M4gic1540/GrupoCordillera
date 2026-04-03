@@ -51,7 +51,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    def sonarUrl = 'http://host.docker.internal:9000'
+                    def sonarUrl = 'http://172.17.0.3:9000'
                     def sonarUser = 'admin'
                     def sonarPassword = 'admin'
                     
