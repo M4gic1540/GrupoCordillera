@@ -36,5 +36,5 @@ build/
 oracleJdk-26/
 .github/java-upgrade/
 
-# Ignorar carpeta de logs
+# Logs
 Logs/

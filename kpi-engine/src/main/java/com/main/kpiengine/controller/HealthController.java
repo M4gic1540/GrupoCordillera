@@ -1,4 +1,4 @@
-package com.main.dataingestion.controller;
+package com.main.kpiengine.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/ingestion")
-@Tag(name = "Health", description = "Estado operativo del microservicio")
+@RequestMapping("/api/kpi")
+@Tag(name = "Health", description = "Estado operativo del microservicio KPI")
 public class HealthController {
 
     @GetMapping("/health")
     @Operation(summary = "Health check", description = "Devuelve estado UP del servicio")
     public Map<String, String> health() {
-        return Map.of("status", "UP", "service", "data-ingestion-service");
+        return Map.of("status", "UP", "service", "kpi-engine");
     }
 }

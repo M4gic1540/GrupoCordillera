@@ -4,9 +4,14 @@ WORKDIR /app
 COPY pom.xml ./
 COPY .mvn ./.mvn
 COPY mvnw ./
+RUN chmod +x mvnw
+
+# Resolve dependencies first to improve Docker layer caching.
+RUN ./mvnw -q -DskipTests dependency:go-offline
+
 COPY src ./src
 
-RUN chmod +x mvnw && ./mvnw -DskipTests clean package
+RUN ./mvnw -DskipTests clean package
 
 FROM eclipse-temurin:25-jre
 WORKDIR /app
