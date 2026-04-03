@@ -49,11 +49,18 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            when {
-                expression { return false }
-            }
             steps {
-                echo 'SonarQube analysis skipped - permission issues. Configure token with proper permissions.'
+                script {
+                    def sonarUrl = 'http://172.17.0.3:9000'
+                    def sonarToken = 'sqp_31d07692fe508884a1822a2b7de6b83c581cebc6'
+                    
+                    sh """
+                        mvn clean verify sonar:sonar \
+                          -Dsonar.projectKey=grupo-cordillera \
+                          -Dsonar.host.url=${sonarUrl} \
+                          -Dsonar.login=${sonarToken}
+                    """
+                }
             }
         }
 
