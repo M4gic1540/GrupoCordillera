@@ -52,7 +52,8 @@ pipeline {
             steps {
                 script {
                     def sonarUrl = 'http://host.docker.internal:9000'
-                    def sonarToken = 'admin'
+                    def sonarUser = 'admin'
+                    def sonarPassword = 'admin'
                     
                     // Analizar authservice
                     dir('authservice') {
@@ -62,7 +63,8 @@ pipeline {
                               -Dsonar.projectName='Grupo Cordillera - Auth Service' \
                               -Dsonar.sources=src/main \
                               -Dsonar.host.url=${sonarUrl} \
-                              -Dsonar.login=${sonarToken}
+                              -Dsonar.login=${sonarUser} \
+                              -Dsonar.password=${sonarPassword}
                         """
                     }
                     
@@ -74,7 +76,8 @@ pipeline {
                               -Dsonar.projectName='Grupo Cordillera - Data Ingestion' \
                               -Dsonar.sources=src/main \
                               -Dsonar.host.url=${sonarUrl} \
-                              -Dsonar.login=${sonarToken}
+                              -Dsonar.login=${sonarUser} \
+                              -Dsonar.password=${sonarPassword}
                         """
                     }
                     
@@ -86,7 +89,8 @@ pipeline {
                               -Dsonar.projectName='Grupo Cordillera - KPI Engine' \
                               -Dsonar.sources=src/main \
                               -Dsonar.host.url=${sonarUrl} \
-                              -Dsonar.login=${sonarToken}
+                              -Dsonar.login=${sonarUser} \
+                              -Dsonar.password=${sonarPassword}
                         """
                     }
                 }
