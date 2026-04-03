@@ -70,7 +70,7 @@ pipeline {
                 expression { return params.DEPLOY_STACK }
             }
             steps {
-                sh 'if command -v docker-compose >/dev/null 2>&1; then docker-compose up -d --build; else docker compose up -d --build; fi'
+                sh 'docker-compose up -d --build'
             }
         }
     }
