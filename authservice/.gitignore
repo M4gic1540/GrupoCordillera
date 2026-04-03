@@ -35,3 +35,6 @@ build/
 ### Local JDK and migration artifacts ###
 oracleJdk-26/
 .github/java-upgrade/
+
+# Ignorar carpeta de logs
+Logs/
