@@ -70,7 +70,10 @@ pipeline {
                 expression { return params.DEPLOY_STACK }
             }
             steps {
-                sh 'docker-compose up -d --build'
+                sh '''
+                    docker-compose down --remove-orphans || true
+                    docker-compose up -d --build
+                '''
             }
         }
     }
