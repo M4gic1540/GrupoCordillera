@@ -1,0 +1,39 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: kpi-engine
+  datasource:
+    url: ${KPI_DB_URL:jdbc:postgresql://postgres-kpi:5432/kpi_db}
+    username: ${KPI_DB_USERNAME:postgres}
+    password: ${KPI_DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  swagger-ui:
+    path: /kpi/docs
+  api-docs:
+    path: /kpi/openapi.json
+
+logging:
+  level:
+    com.main.kpiengine: INFO
+    com.zaxxer.hikari: WARN
+    org.hibernate: WARN
+    org.springframework: WARN
+    Exception: ERROR
+    root: WARN
+
+

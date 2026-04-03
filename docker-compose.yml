@@ -16,6 +16,23 @@ services:
       timeout: 5s
       retries: 5
 
+  postgres-kpi:
+    image: postgres:15
+    container_name: kpiengine-postgres
+    environment:
+      POSTGRES_DB: ${KPI_DB_NAME:-kpi_db}
+      POSTGRES_USER: ${KPI_DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${KPI_DB_PASSWORD:-postgres}
+    expose:
+      - "5432"
+    volumes:
+      - postgres_kpi_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${KPI_DB_USERNAME:-postgres} -d ${KPI_DB_NAME:-kpi_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   postgres:
     image: postgres:15
     container_name: authservice-postgres
@@ -74,6 +91,8 @@ services:
     depends_on:
       postgres-events:
         condition: service_healthy
+      kpi-engine:
+        condition: service_started
     environment:
       EVENTS_DB_URL: jdbc:postgresql://postgres-events:5432/${EVENTS_DB_NAME:-events_db}
       EVENTS_DB_USERNAME: ${EVENTS_DB_USERNAME:-postgres}
@@ -89,6 +108,8 @@ services:
     depends_on:
       postgres-events:
         condition: service_healthy
+      kpi-engine:
+        condition: service_started
     environment:
       EVENTS_DB_URL: jdbc:postgresql://postgres-events:5432/${EVENTS_DB_NAME:-events_db}
       EVENTS_DB_USERNAME: ${EVENTS_DB_USERNAME:-postgres}
@@ -96,6 +117,22 @@ services:
       KPI_ENGINE_BASE_URL: ${KPI_ENGINE_BASE_URL:-http://kpi-engine:8082}
     expose:
       - "8081"
+
+  kpi-engine:
+    build:
+      context: ./kpi-engine
+      dockerfile: Dockerfile
+    depends_on:
+      postgres-kpi:
+        condition: service_healthy
+    environment:
+      KPI_DB_URL: jdbc:postgresql://postgres-kpi:5432/${KPI_DB_NAME:-kpi_db}
+      KPI_DB_USERNAME: ${KPI_DB_USERNAME:-postgres}
+      KPI_DB_PASSWORD: ${KPI_DB_PASSWORD:-postgres}
+    ports:
+      - "8082:8082"
+    expose:
+      - "8082"
 
   api-gateway:
     image: nginx:1.27-alpine
@@ -105,6 +142,7 @@ services:
       - authservice-2
       - data-ingestion-service-1
       - data-ingestion-service-2
+      - kpi-engine
     volumes:
       - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
@@ -113,3 +151,4 @@ services:
 volumes:
   postgres_data:
   postgres_events_data:
+  postgres_kpi_data:
