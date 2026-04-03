@@ -53,7 +53,7 @@ pipeline {
                 script {
                     def sonarUrl = 'http://172.17.0.3:9000'
                     def sonarUser = 'admin'
-                    def sonarPassword = 'admin'
+                    def sonarPassword = 'admin123'
                     
                     // Analizar authservice
                     dir('authservice') {
