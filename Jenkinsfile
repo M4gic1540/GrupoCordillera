@@ -49,11 +49,38 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            when {
-                expression { return false }
-            }
             steps {
-                echo 'SonarQube analysis skipped - auth issues. Enable in next iteration.'
+                withSonarQubeEnv('SonarQube') {
+                    // Analizar authservice
+                    dir('authservice') {
+                        sh '''
+                            /opt/sonar-scanner/bin/sonar-scanner \
+                              -Dsonar.projectKey=grupo-cordillera-authservice \
+                              -Dsonar.projectName="Grupo Cordillera - Auth Service" \
+                              -Dsonar.sources=src/main
+                        '''
+                    }
+                    
+                    // Analizar data-ingestion-service
+                    dir('data-ingestion-service') {
+                        sh '''
+                            /opt/sonar-scanner/bin/sonar-scanner \
+                              -Dsonar.projectKey=grupo-cordillera-data-ingestion \
+                              -Dsonar.projectName="Grupo Cordillera - Data Ingestion" \
+                              -Dsonar.sources=src/main
+                        '''
+                    }
+                    
+                    // Analizar kpi-engine
+                    dir('kpi-engine') {
+                        sh '''
+                            /opt/sonar-scanner/bin/sonar-scanner \
+                              -Dsonar.projectKey=grupo-cordillera-kpi-engine \
+                              -Dsonar.projectName="Grupo Cordillera - KPI Engine" \
+                              -Dsonar.sources=src/main
+                        '''
+                    }
+                }
             }
         }
 
