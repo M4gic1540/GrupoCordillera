@@ -78,4 +78,7 @@ pipeline {
             echo 'Pipeline fallo. Revisar logs y reportes de pruebas.'
         }
     }
+tools {
+  jdk 'jdk21' // o el nombre que configuraste
+}
 }
