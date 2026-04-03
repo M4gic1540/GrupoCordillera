@@ -61,6 +61,7 @@ pipeline {
                               -Dsonar.projectKey=grupo-cordillera-authservice \
                               -Dsonar.projectName='Grupo Cordillera - Auth Service' \
                               -Dsonar.sources=src/main \
+                              -Dsonar.java.binaries=target/classes \
                               -Dsonar.host.url=${sonarUrl} \
                               -Dsonar.login=${sonarToken}
                         """
@@ -73,6 +74,7 @@ pipeline {
                               -Dsonar.projectKey=grupo-cordillera-data-ingestion \
                               -Dsonar.projectName='Grupo Cordillera - Data Ingestion' \
                               -Dsonar.sources=src/main \
+                              -Dsonar.java.binaries=target/classes \
                               -Dsonar.host.url=${sonarUrl} \
                               -Dsonar.login=${sonarToken}
                         """
@@ -85,6 +87,7 @@ pipeline {
                               -Dsonar.projectKey=grupo-cordillera-kpi-engine \
                               -Dsonar.projectName='Grupo Cordillera - KPI Engine' \
                               -Dsonar.sources=src/main \
+                              -Dsonar.java.binaries=target/classes \
                               -Dsonar.host.url=${sonarUrl} \
                               -Dsonar.login=${sonarToken}
                         """
