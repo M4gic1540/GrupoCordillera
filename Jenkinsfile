@@ -67,14 +67,10 @@ pipeline {
 
         stage('Deploy Stack') {
             when {
-                expression { return params.DEPLOY_STACK }
+                expression { return false }
             }
             steps {
-                sh '''
-                    docker-compose down -v --remove-orphans || true
-                    docker ps -a | grep -E "postgres|authservice|data-ingestion|kpi-engine" | awk '{print $1}' | xargs docker rm -f 2>/dev/null || true
-                    docker-compose up -d --build
-                '''
+                echo 'Deploy Stack disabled - nginx.conf mount issues. Configure docker-compose paths manually.'
             }
         }
     }
