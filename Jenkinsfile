@@ -49,11 +49,47 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            when {
-                expression { return false }
-            }
             steps {
-                echo 'SonarQube analysis skipped - auth issues. Configure credentials manually in Manage Jenkins > System > SonarQube servers'
+                script {
+                    def sonarUrl = 'http://172.17.0.3:9000'
+                    def sonarToken = 'sqp_31d07692fe508884a1822a2b7de6b83c581cebc6'
+                    
+                    // Analizar authservice
+                    dir('authservice') {
+                        sh """
+                            /opt/sonar-scanner/bin/sonar-scanner \
+                              -Dsonar.projectKey=grupo-cordillera-authservice \
+                              -Dsonar.projectName='Grupo Cordillera - Auth Service' \
+                              -Dsonar.sources=src/main \
+                              -Dsonar.host.url=${sonarUrl} \
+                              -Dsonar.login=${sonarToken}
+                        """
+                    }
+                    
+                    // Analizar data-ingestion-service
+                    dir('data-ingestion-service') {
+                        sh """
+                            /opt/sonar-scanner/bin/sonar-scanner \
+                              -Dsonar.projectKey=grupo-cordillera-data-ingestion \
+                              -Dsonar.projectName='Grupo Cordillera - Data Ingestion' \
+                              -Dsonar.sources=src/main \
+                              -Dsonar.host.url=${sonarUrl} \
+                              -Dsonar.login=${sonarToken}
+                        """
+                    }
+                    
+                    // Analizar kpi-engine
+                    dir('kpi-engine') {
+                        sh """
+                            /opt/sonar-scanner/bin/sonar-scanner \
+                              -Dsonar.projectKey=grupo-cordillera-kpi-engine \
+                              -Dsonar.projectName='Grupo Cordillera - KPI Engine' \
+                              -Dsonar.sources=src/main \
+                              -Dsonar.host.url=${sonarUrl} \
+                              -Dsonar.login=${sonarToken}
+                        """
+                    }
+                }
             }
         }
 
