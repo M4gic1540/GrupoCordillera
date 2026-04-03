@@ -1,0 +1,79 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: data-ingestion-service
+  datasource:
+    url: ${EVENTS_DB_URL:jdbc:postgresql://postgres-events:5432/events_db}
+    username: ${EVENTS_DB_USERNAME:postgres}
+    password: ${EVENTS_DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+logging:
+  level:
+    com.main.dataingestion: INFO
+
+source-systems:
+  systems:
+    - key: crm
+      base-url: ${CRM_BASE_URL:http://mock-crm:9001}
+      timeout-ms: 2500
+      endpoint-path: /api/events
+      circuit-breaker-name: crmConnector
+    - key: erp
+      base-url: ${ERP_BASE_URL:http://mock-erp:9002}
+      timeout-ms: 2500
+      endpoint-path: /api/events
+      circuit-breaker-name: erpConnector
+    - key: hr
+      base-url: ${HR_BASE_URL:http://mock-hr:9003}
+      timeout-ms: 2500
+      endpoint-path: /api/events
+      circuit-breaker-name: hrConnector
+    - key: finance
+      base-url: ${FINANCE_BASE_URL:http://mock-finance:9004}
+      timeout-ms: 2500
+      endpoint-path: /api/events
+      circuit-breaker-name: financeConnector
+    - key: operations
+      base-url: ${OPERATIONS_BASE_URL:http://mock-ops:9005}
+      timeout-ms: 2500
+      endpoint-path: /api/events
+      circuit-breaker-name: operationsConnector
+
+kpi-engine:
+  base-url: ${KPI_ENGINE_BASE_URL:http://kpi-engine:8082}
+  recalc-path: /api/kpi/recalculate
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      crmConnector:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        sliding-window-size: 10
+      erpConnector:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        sliding-window-size: 10
+      hrConnector:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        sliding-window-size: 10
+      financeConnector:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        sliding-window-size: 10
+      operationsConnector:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        sliding-window-size: 10

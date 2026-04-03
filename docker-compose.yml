@@ -35,7 +35,7 @@ services:
 
   authservice-1:
     build:
-      context: .
+      context: ./authservice
       dockerfile: Dockerfile
     depends_on:
       postgres:
@@ -52,7 +52,7 @@ services:
 
   authservice-2:
     build:
-      context: .
+      context: ./authservice
       dockerfile: Dockerfile
     depends_on:
       postgres:
@@ -67,7 +67,22 @@ services:
     volumes:
       - ./Logs:/app/Logs
 
-  data-ingestion-service:
+  data-ingestion-service-1:
+    build:
+      context: ./data-ingestion-service
+      dockerfile: Dockerfile
+    depends_on:
+      postgres-events:
+        condition: service_healthy
+    environment:
+      EVENTS_DB_URL: jdbc:postgresql://postgres-events:5432/${EVENTS_DB_NAME:-events_db}
+      EVENTS_DB_USERNAME: ${EVENTS_DB_USERNAME:-postgres}
+      EVENTS_DB_PASSWORD: ${EVENTS_DB_PASSWORD:-postgres}
+      KPI_ENGINE_BASE_URL: ${KPI_ENGINE_BASE_URL:-http://kpi-engine:8082}
+    ports:
+      - "8081:8081"
+
+  data-ingestion-service-2:
     build:
       context: ./data-ingestion-service
       dockerfile: Dockerfile
@@ -88,7 +103,8 @@ services:
     depends_on:
       - authservice-1
       - authservice-2
-      - data-ingestion-service
+      - data-ingestion-service-1
+      - data-ingestion-service-2
     volumes:
       - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
