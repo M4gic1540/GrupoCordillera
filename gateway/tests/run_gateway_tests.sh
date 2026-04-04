@@ -79,6 +79,17 @@ expect_status() {
   fi
 }
 
+safe_curl_body() {
+  local url="$1"
+  curl -s "$url" || true
+}
+
+safe_curl_status() {
+  local url="$1"
+  shift
+  curl -s -o /dev/null -w "%{http_code}" "$@" "$url" || echo "000"
+}
+
 cleanup() {
   docker rm -f gw-nginx-test gw-auth-1 gw-auth-2 gw-ingestion-1 gw-ingestion-2 gw-kpi >/dev/null 2>&1 || true
   docker network rm gw-test-net >/dev/null 2>&1 || true
@@ -142,19 +153,25 @@ for _ in {1..30}; do
   sleep 1
 done
 
-auth_body="$(curl -s "http://localhost:18080/api/auth/ping")"
+if ! curl -s "http://localhost:18080/" >/dev/null 2>&1; then
+  record_test "Gateway reachable on localhost:18080" "failed" "Gateway not reachable after startup wait"
+  write_junit_report
+  exit 1
+fi
+
+auth_body="$(safe_curl_body "http://localhost:18080/api/auth/ping")"
 expect_contains "Route /api/auth/* reaches auth upstream" "$auth_body" "AUTH_OK"
 
-ingestion_body="$(curl -s "http://localhost:18080/api/ingestion/ping")"
+ingestion_body="$(safe_curl_body "http://localhost:18080/api/ingestion/ping")"
 expect_contains "Route /api/ingestion/* reaches ingestion upstream" "$ingestion_body" "INGESTION_OK"
 
-kpi_body="$(curl -s "http://localhost:18080/kpi/docs")"
+kpi_body="$(safe_curl_body "http://localhost:18080/kpi/docs")"
 expect_contains "Route /kpi/docs rewrites and proxies to kpi upstream" "$kpi_body" "KPI_OK"
 
-status_waf_query="$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:18080/api/ingestion/ping?x=union+select")"
+status_waf_query="$(safe_curl_status "http://localhost:18080/api/ingestion/ping?x=union+select")"
 expect_status "WAF blocks SQLi-like query strings" "$status_waf_query" "403"
 
-status_waf_ua="$(curl -s -o /dev/null -w "%{http_code}" -H "User-Agent: sqlmap" "http://localhost:18080/api/kpi/ping")"
+status_waf_ua="$(safe_curl_status "http://localhost:18080/api/kpi/ping" -H "User-Agent: sqlmap")"
 expect_status "WAF blocks malicious user-agent" "$status_waf_ua" "403"
 
 write_junit_report
