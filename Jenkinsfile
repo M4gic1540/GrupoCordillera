@@ -1,0 +1,90 @@
+pipeline {
+    agent any
+
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    parameters {
+        booleanParam(name: 'DEPLOY_STACK', defaultValue: false, description: 'Levantar stack con Docker Compose al final del pipeline')
+    }
+
+    environment {
+        MAVEN_OPTS = '-Dmaven.test.failure.ignore=false'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build & Test authservice') {
+            steps {
+                dir('authservice') {
+                    sh 'chmod +x mvnw'
+                    sh './mvnw -B clean test'
+                }
+            }
+        }
+
+        stage('Build & Test data-ingestion-service') {
+            steps {
+                dir('data-ingestion-service') {
+                    sh 'chmod +x mvnw'
+                    sh './mvnw -B clean test'
+                }
+            }
+        }
+
+        stage('Build & Test kpi-engine') {
+            steps {
+                dir('kpi-engine') {
+                    sh 'chmod +x mvnw'
+                    sh './mvnw -B clean test'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            when {
+                expression { return false }
+            }
+            steps {
+                echo 'SonarQube analysis disabled. Run manually from authservice: ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar -Dsonar.host.url=http://host.docker.internal:9000 -Dsonar.login=sqp_31d07692fe508884a1822a2b7de6b83c581cebc6'
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                sh 'docker build -t grupocordillera/authservice:latest ./authservice'
+                sh 'docker build -t grupocordillera/data-ingestion-service:latest ./data-ingestion-service'
+                sh 'docker build -t grupocordillera/kpi-engine:latest ./kpi-engine'
+            }
+        }
+
+        stage('Deploy Stack') {
+            when {
+                expression { return false }
+            }
+            steps {
+                echo 'Deploy Stack disabled - nginx.conf mount issues. Configure docker-compose paths manually.'
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: '**/target/*.jar, **/target/surefire-reports/*.xml', allowEmptyArchive: true
+            junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
+        }
+        success {
+            echo 'Pipeline completado correctamente.'
+        }
+        failure {
+            echo 'Pipeline fallo. Revisar logs y reportes de pruebas.'
+        }
+    }
+}

@@ -27,18 +27,20 @@ public class KpiEngineService {
 
     @Transactional
     public RecalculateKpiResponse recalculate(RecalculateKpiRequest request) {
+        int affectedRecords = request.getAffectedRecords();
+
         KpiDefinition throughputKpi = ensureDefinition("INGEST_THROUGHPUT", "Ingestion Throughput", "EVENT_DRIVEN");
         KpiDefinition qualityKpi = ensureDefinition("DATA_QUALITY_INDEX", "Data Quality Index", "EVENT_DRIVEN");
 
         OffsetDateTime now = OffsetDateTime.now();
-        KpiSnapshot throughputSnapshot = buildSnapshot(throughputKpi, request, now, BigDecimal.valueOf(request.getAffectedRecords()));
-        KpiSnapshot qualitySnapshot = buildSnapshot(qualityKpi, request, now, computeQualityIndex(request.getAffectedRecords()));
+        KpiSnapshot throughputSnapshot = buildSnapshot(throughputKpi, request, now, BigDecimal.valueOf(affectedRecords));
+        KpiSnapshot qualitySnapshot = buildSnapshot(qualityKpi, request, now, computeQualityIndex(affectedRecords));
 
         snapshotRepository.saveAll(List.of(throughputSnapshot, qualitySnapshot));
 
         return new RecalculateKpiResponse(
                 request.getSourceSystem(),
-                request.getAffectedRecords(),
+                affectedRecords,
                 List.of(toResponse(throughputSnapshot), toResponse(qualitySnapshot))
         );
     }
