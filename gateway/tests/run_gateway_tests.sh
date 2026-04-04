@@ -80,7 +80,7 @@ expect_status() {
 }
 
 cleanup() {
-  docker rm -f gw-nginx-test gw-auth-1 gw-auth-2 gw-ingestion-1 gw-ingestion-2 gw-kpi >/dev/null 2>&1 || true
+  docker rm -f gw-nginx-lint gw-nginx-test gw-auth-1 gw-auth-2 gw-ingestion-1 gw-ingestion-2 gw-kpi >/dev/null 2>&1 || true
   docker network rm gw-test-net >/dev/null 2>&1 || true
 }
 
@@ -93,11 +93,14 @@ if [[ ! -f "$NGINX_CONF" ]]; then
   exit 1
 fi
 
-if docker run --rm -v "$NGINX_CONF:/etc/nginx/nginx.conf:ro" nginx:1.27-alpine nginx -t >/dev/null 2>&1; then
+docker run -d --name gw-nginx-lint nginx:1.27-alpine >/dev/null
+docker cp "$NGINX_CONF" gw-nginx-lint:/etc/nginx/nginx.conf >/dev/null
+if docker exec gw-nginx-lint nginx -t >/dev/null 2>&1; then
   record_test "Nginx syntax is valid" "passed"
 else
   record_test "Nginx syntax is valid" "failed" "nginx -t failed"
 fi
+docker rm -f gw-nginx-lint >/dev/null 2>&1 || true
 
 if grep -Eq 'limit_req_zone\s+\$binary_remote_addr\s+zone=api_limit:10m\s+rate=20r/s;' "$NGINX_CONF"; then
   record_test "Rate limit configured" "passed"
@@ -131,7 +134,9 @@ docker run -d --name gw-ingestion-1 --network gw-test-net --network-alias data-i
 docker run -d --name gw-ingestion-2 --network gw-test-net --network-alias data-ingestion-service-2 hashicorp/http-echo:1.0.0 -listen=:8081 -text='INGESTION_OK_2' >/dev/null
 docker run -d --name gw-kpi --network gw-test-net --network-alias kpi-engine hashicorp/http-echo:1.0.0 -listen=:8082 -text='KPI_OK' >/dev/null
 
-docker run -d --name gw-nginx-test --network gw-test-net -p 18080:8080 -v "$NGINX_CONF:/etc/nginx/nginx.conf:ro" nginx:1.27-alpine >/dev/null
+docker run -d --name gw-nginx-test --network gw-test-net -p 18080:8080 nginx:1.27-alpine >/dev/null
+docker cp "$NGINX_CONF" gw-nginx-test:/etc/nginx/nginx.conf >/dev/null
+docker exec gw-nginx-test nginx -s reload >/dev/null
 
 for _ in {1..30}; do
   if curl -sSf "http://localhost:18080/" >/dev/null 2>&1; then
