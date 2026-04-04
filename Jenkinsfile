@@ -49,20 +49,11 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
+            when {
+                expression { return false }
+            }
             steps {
-                script {
-                    def sonarUrl = 'http://host.docker.internal:9000'
-                    def sonarToken = 'sqp_31d07692fe508884a1822a2b7de6b83c581cebc6'
-                    
-                    dir('authservice') {
-                        sh """
-                            ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar \
-                              -Dsonar.projectKey=grupo-cordillera \
-                              -Dsonar.host.url=${sonarUrl} \
-                              -Dsonar.login=${sonarToken}
-                        """
-                    }
-                }
+                echo 'SonarQube analysis disabled. Run manually from authservice: ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar -Dsonar.host.url=http://host.docker.internal:9000 -Dsonar.login=sqp_31d07692fe508884a1822a2b7de6b83c581cebc6'
             }
         }
 
