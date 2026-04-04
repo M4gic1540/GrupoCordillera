@@ -85,6 +85,7 @@ echo "Quality gate OK: cada clase objetivo tiene al menos 20 tests"
 
         stage('Gateway Test Suite') {
             steps {
+                sh 'ls -l gateway/nginx.conf'
                 sh 'chmod +x gateway/tests/run_gateway_tests.sh'
                 sh './gateway/tests/run_gateway_tests.sh'
             }
