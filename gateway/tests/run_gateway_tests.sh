@@ -80,7 +80,7 @@ expect_status() {
 }
 
 cleanup() {
-  docker rm -f gw-nginx-lint gw-nginx-test gw-auth-1 gw-auth-2 gw-ingestion-1 gw-ingestion-2 gw-kpi >/dev/null 2>&1 || true
+  docker rm -f gw-nginx-test gw-auth-1 gw-auth-2 gw-ingestion-1 gw-ingestion-2 gw-kpi >/dev/null 2>&1 || true
   docker network rm gw-test-net >/dev/null 2>&1 || true
 }
 
@@ -92,15 +92,6 @@ if [[ ! -f "$NGINX_CONF" ]]; then
   write_junit_report
   exit 1
 fi
-
-docker run -d --name gw-nginx-lint nginx:1.27-alpine >/dev/null
-docker cp "$NGINX_CONF" gw-nginx-lint:/etc/nginx/nginx.conf >/dev/null
-if docker exec gw-nginx-lint nginx -t >/dev/null 2>&1; then
-  record_test "Nginx syntax is valid" "passed"
-else
-  record_test "Nginx syntax is valid" "failed" "nginx -t failed"
-fi
-docker rm -f gw-nginx-lint >/dev/null 2>&1 || true
 
 if grep -Eq 'limit_req_zone\s+\$binary_remote_addr\s+zone=api_limit:10m\s+rate=20r/s;' "$NGINX_CONF"; then
   record_test "Rate limit configured" "passed"
@@ -136,6 +127,12 @@ docker run -d --name gw-kpi --network gw-test-net --network-alias kpi-engine has
 
 docker run -d --name gw-nginx-test --network gw-test-net -p 18080:8080 nginx:1.27-alpine >/dev/null
 docker cp "$NGINX_CONF" gw-nginx-test:/etc/nginx/nginx.conf >/dev/null
+if docker exec gw-nginx-test nginx -t >/dev/null 2>&1; then
+  record_test "Nginx syntax is valid" "passed"
+else
+  lint_error="$(docker exec gw-nginx-test nginx -t 2>&1 | tr '\n' ' ' | sed 's/"/\x27/g')"
+  record_test "Nginx syntax is valid" "failed" "nginx -t failed: $lint_error"
+fi
 docker exec gw-nginx-test nginx -s reload >/dev/null
 
 for _ in {1..30}; do
