@@ -56,7 +56,7 @@ pipeline {
                     
                     dir('authservice') {
                         sh """
-                            ./mvnw clean verify sonar:sonar \
+                            ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar \
                               -Dsonar.projectKey=grupo-cordillera \
                               -Dsonar.host.url=${sonarUrl} \
                               -Dsonar.login=${sonarToken}
