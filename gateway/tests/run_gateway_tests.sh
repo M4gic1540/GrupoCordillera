@@ -81,13 +81,13 @@ expect_status() {
 
 safe_curl_body() {
   local url="$1"
-  curl -s "$url" || true
+  docker run --rm --network gw-test-net curlimages/curl:8.10.1 -s "$url" || true
 }
 
 safe_curl_status() {
   local url="$1"
   shift
-  curl -s -o /dev/null -w "%{http_code}" "$@" "$url" || echo "000"
+  docker run --rm --network gw-test-net curlimages/curl:8.10.1 -s -o /dev/null -w "%{http_code}" "$@" "$url" || echo "000"
 }
 
 cleanup() {
@@ -136,7 +136,7 @@ docker run -d --name gw-ingestion-1 --network gw-test-net --network-alias data-i
 docker run -d --name gw-ingestion-2 --network gw-test-net --network-alias data-ingestion-service-2 hashicorp/http-echo:1.0.0 -listen=:8081 -text='INGESTION_OK_2' >/dev/null
 docker run -d --name gw-kpi --network gw-test-net --network-alias kpi-engine hashicorp/http-echo:1.0.0 -listen=:8082 -text='KPI_OK' >/dev/null
 
-docker run -d --name gw-nginx-test --network gw-test-net -p 18080:8080 nginx:1.27-alpine >/dev/null
+docker run -d --name gw-nginx-test --network gw-test-net nginx:1.27-alpine >/dev/null
 docker cp "$NGINX_CONF" gw-nginx-test:/etc/nginx/nginx.conf >/dev/null
 if docker exec gw-nginx-test nginx -t >/dev/null 2>&1; then
   record_test "Nginx syntax is valid" "passed"
@@ -147,31 +147,31 @@ fi
 docker exec gw-nginx-test nginx -s reload >/dev/null
 
 for _ in {1..30}; do
-  if curl -sSf "http://localhost:18080/" >/dev/null 2>&1; then
+  if docker run --rm --network gw-test-net curlimages/curl:8.10.1 -sSf "http://gw-nginx-test:8080/" >/dev/null 2>&1; then
     break
   fi
   sleep 1
 done
 
-if ! curl -s "http://localhost:18080/" >/dev/null 2>&1; then
-  record_test "Gateway reachable on localhost:18080" "failed" "Gateway not reachable after startup wait"
+if ! docker run --rm --network gw-test-net curlimages/curl:8.10.1 -s "http://gw-nginx-test:8080/" >/dev/null 2>&1; then
+  record_test "Gateway reachable on internal network" "failed" "Gateway not reachable on gw-test-net after startup wait"
   write_junit_report
   exit 1
 fi
 
-auth_body="$(safe_curl_body "http://localhost:18080/api/auth/ping")"
+auth_body="$(safe_curl_body "http://gw-nginx-test:8080/api/auth/ping")"
 expect_contains "Route /api/auth/* reaches auth upstream" "$auth_body" "AUTH_OK"
 
-ingestion_body="$(safe_curl_body "http://localhost:18080/api/ingestion/ping")"
+ingestion_body="$(safe_curl_body "http://gw-nginx-test:8080/api/ingestion/ping")"
 expect_contains "Route /api/ingestion/* reaches ingestion upstream" "$ingestion_body" "INGESTION_OK"
 
-kpi_body="$(safe_curl_body "http://localhost:18080/kpi/docs")"
+kpi_body="$(safe_curl_body "http://gw-nginx-test:8080/kpi/docs")"
 expect_contains "Route /kpi/docs rewrites and proxies to kpi upstream" "$kpi_body" "KPI_OK"
 
-status_waf_query="$(safe_curl_status "http://localhost:18080/api/ingestion/ping?x=union+select")"
+status_waf_query="$(safe_curl_status "http://gw-nginx-test:8080/api/ingestion/ping?x=union+select")"
 expect_status "WAF blocks SQLi-like query strings" "$status_waf_query" "403"
 
-status_waf_ua="$(safe_curl_status "http://localhost:18080/api/kpi/ping" -H "User-Agent: sqlmap")"
+status_waf_ua="$(safe_curl_status "http://gw-nginx-test:8080/api/kpi/ping" -H "User-Agent: sqlmap")"
 expect_status "WAF blocks malicious user-agent" "$status_waf_ua" "403"
 
 write_junit_report
