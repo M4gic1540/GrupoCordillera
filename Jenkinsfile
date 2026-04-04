@@ -83,6 +83,13 @@ echo "Quality gate OK: cada clase objetivo tiene al menos 20 tests"
             }
         }
 
+        stage('Gateway Test Suite') {
+            steps {
+                sh 'chmod +x gateway/tests/run_gateway_tests.sh'
+                sh './gateway/tests/run_gateway_tests.sh'
+            }
+        }
+
         stage('Build & Test kpi-engine') {
             steps {
                 dir('kpi-engine') {
@@ -121,8 +128,8 @@ echo "Quality gate OK: cada clase objetivo tiene al menos 20 tests"
 
     post {
         always {
-            archiveArtifacts artifacts: '**/target/*.jar, **/target/surefire-reports/*.xml', allowEmptyArchive: true
-            junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
+            archiveArtifacts artifacts: '**/target/*.jar, **/target/surefire-reports/*.xml, gateway/test-results/*.xml', allowEmptyArchive: true
+            junit testResults: '**/target/surefire-reports/*.xml, gateway/test-results/*.xml', allowEmptyResults: true
         }
         success {
             echo 'Pipeline completado correctamente.'
