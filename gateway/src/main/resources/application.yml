@@ -1,0 +1,74 @@
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+gateway:
+  security:
+    auth-validation-url: ${AUTH_VALIDATION_URL:http://authservice-1:8080/api/auth/validate}
+    protected-paths:
+      - /api/ingestion/**
+      - /api/kpi/**
+      - /api/**
+    excluded-paths:
+      - /api/auth/**
+      - /actuator/**
+      - /kpi/**
+
+spring:
+  cloud:
+    gateway:
+      default-filters:
+        - PreserveHostHeader
+      routes:
+        - id: auth-route-1
+          uri: ${AUTHSERVICE_1_URL:http://authservice-1:8080}
+          predicates:
+            - Path=/api/auth/**
+            - Weight=auth-group,50
+
+        - id: auth-route-2
+          uri: ${AUTHSERVICE_2_URL:http://authservice-2:8080}
+          predicates:
+            - Path=/api/auth/**
+            - Weight=auth-group,50
+
+        - id: ingestion-route-1
+          uri: ${INGESTION_1_URL:http://data-ingestion-service-1:8081}
+          predicates:
+            - Path=/api/ingestion/**
+            - Weight=ingestion-group,50
+
+        - id: ingestion-route-2
+          uri: ${INGESTION_2_URL:http://data-ingestion-service-2:8081}
+          predicates:
+            - Path=/api/ingestion/**
+            - Weight=ingestion-group,50
+
+        - id: kpi-api-route
+          uri: ${KPI_ENGINE_URL:http://kpi-engine:8082}
+          predicates:
+            - Path=/api/kpi/**
+
+        - id: kpi-docs-route
+          uri: ${KPI_ENGINE_URL:http://kpi-engine:8082}
+          predicates:
+            - Path=/kpi/**
+          filters:
+            - StripPrefix=1
+
+        - id: api-fallback-auth-1
+          uri: ${AUTHSERVICE_1_URL:http://authservice-1:8080}
+          predicates:
+            - Path=/api/**
+            - Weight=api-fallback-auth,50
+
+        - id: api-fallback-auth-2
+          uri: ${AUTHSERVICE_2_URL:http://authservice-2:8080}
+          predicates:
+            - Path=/api/**
+            - Weight=api-fallback-auth,50
