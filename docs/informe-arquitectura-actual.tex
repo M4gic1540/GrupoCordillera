@@ -12,7 +12,7 @@
 \title{Informe del Estado Actual del Sistema\\Proyecto GrupoCordillera}
 \author{Equipo de Desarrollo}
 \date{\today}
-
+    \item \textbf{gateway}: Microservicio Spring Cloud Gateway (reemplaza NGINX). Realiza balanceo, ruteo dinámico, control de acceso, validación de token JWT, reglas de defensa básica, propagación de Correlation ID y cuenta con pruebas automatizadas integradas en el pipeline CI/CD.
 \begin{document}
 \maketitle
 
@@ -21,13 +21,14 @@ Este informe describe el estado actual del desarrollo del repositorio \texttt{Gr
 
 Repositorio: \url{https://github.com/M4gic1540/GrupoCordillera.git}
 
-\section{Arquitectura General del Proyecto}
+    \item 1 gateway (Spring Cloud Gateway) como punto de entrada.
 El sistema esta organizado como un conjunto de microservicios desplegables de forma independiente, con una capa de gateway para ruteo y controles de seguridad perimetral.
 
 \subsection{Componentes principales}
 \begin{itemize}[leftmargin=*]
     \item \textbf{authservice}: Servicio de autenticacion/autorizacion (registro, login, refresh, validacion JWT y perfil de usuario).
     \item \textbf{data-ingestion-service}: Servicio de ingesta de eventos y coordinacion con el motor KPI.
+Beneficio: el servicio de autenticación concentra reglas de negocio (registro, login, refresh, perfil) sin mezclar SQL ni detalles de infraestructura. Además, la integración con sistemas externos se desacopla mediante el patrón Factory Method, facilitando la extensión de conectores.
     \item \textbf{kpi-engine}: Servicio de calculo y exposicion de indicadores (KPIs).
     \item \textbf{gateway}: Reverse proxy NGINX con balanceo, control de acceso, validacion de token y reglas de defensa basica.
 \end{itemize}
@@ -38,6 +39,7 @@ La composicion del sistema en desarrollo se realiza con \texttt{docker-compose.y
     \item 3 bases de datos PostgreSQL separadas por dominio (auth, events, kpi).
     \item 2 replicas de \texttt{authservice} y 2 replicas de \texttt{data-ingestion-service}.
     \item 1 instancia de \texttt{kpi-engine}.
+Actualmente se utilizan 3 ramas principales, alineadas y sincronizadas tras los últimos merges:
     \item 1 gateway NGINX como punto de entrada.
 \end{itemize}
 
@@ -49,11 +51,12 @@ El \textit{Repository Pattern} abstrae el acceso a datos para desacoplar la logi
 
 \subsection{Aplicacion en authservice}
 En \texttt{authservice} se observa una aplicacion madura del patron:
-\begin{itemize}[leftmargin=*]
-    \item \texttt{UserRepository}: operaciones de consulta de usuario por email y verificacion de existencia.
-    \item \texttt{RefreshTokenRepository}: busqueda de tokens vigentes y operaciones de limpieza/rotacion de refresh tokens.
-\end{itemize}
-
+    \item Balanceo y ruteo dinámico para authservice, data-ingestion-service y kpi-engine.
+    \item Filtro global de autenticación y autorización JWT.
+    \item Limitación de tasa (rate limiting) por IP.
+    \item Reglas WAF básicas para bloquear patrones de inyección y exploración maliciosa.
+    \item Propagación de \texttt{X-Correlation-ID} para observabilidad transversal.
+    \item Pruebas automatizadas (más de 100 tests) ejecutadas en Jenkins.
 Beneficio: el servicio de autenticacion concentra reglas de negocio (registro, login, refresh, perfil) sin mezclar SQL ni detalles de infraestructura.
 
 \subsection{Aplicacion en data-ingestion-service}
@@ -69,6 +72,11 @@ Beneficio: el servicio de ingesta mantiene un flujo limpio para evolucionar haci
 
 Beneficio: separa definiciones de KPI y resultados calculados, mejorando trazabilidad y mantenibilidad.
 
+    \begin{itemize}[leftmargin=*]
+        \item Integración de pruebas automatizadas en gateway, authservice, data-ingestion-service y kpi-engine (más de 400 tests en total).
+        \item Validación de cobertura de pruebas y calidad de código en cada build.
+        \item Uso de Maven Wrapper en todos los microservicios para portabilidad y consistencia en CI/CD.
+    \end{itemize}
 \subsection{Valor de la decision}
 La eleccion de Repository Pattern en los tres servicios permite:
 \begin{itemize}[leftmargin=*]
@@ -77,12 +85,22 @@ La eleccion de Repository Pattern en los tres servicios permite:
     \item Menor acoplamiento con la base de datos y mayor portabilidad.
 \end{itemize}
 
+    \item Integración de conectores externos con Factory Method en authservice.
+    \item Pruebas de integración, E2E, performance y seguridad en gateway, data-ingestion-service y kpi-engine.
 \section{Distribucion del Repositorio y Estrategia de Ramas}
 Actualmente se utilizan 3 ramas principales:
 \begin{itemize}[leftmargin=*]
     \item \textbf{main}: rama estable de referencia para entregas consolidadas.
     \item \textbf{developer}: rama de integracion continua del equipo, donde se consolidan cambios validados.
     \item \textbf{feature}: rama de trabajo para implementaciones incrementales, correcciones y experimentacion controlada.
+\end{itemize}
+\textbf{Nota:} Tras los últimos cambios, se completaron los siguientes puntos:
+\begin{itemize}[leftmargin=*]
+    \item Implementación del patrón Factory Method para conectores externos en authservice (RNF-14).
+    \item Pruebas automatizadas en todos los microservicios (más de 400 tests).
+    \item Integración y alineación de ramas feature, developer y main.
+    \item Uso de Spring Cloud Gateway como gateway principal.
+    \item Uso de Maven Wrapper y pipeline CI/CD robusto.
 \end{itemize}
 
 \subsection{Por que esta decision es correcta}
@@ -94,17 +112,18 @@ Actualmente se utilizan 3 ramas principales:
 
 Esta estrategia es coherente con practicas de CI/CD y con la necesidad de controlar regresiones en una arquitectura distribuida.
 
-\section{Gateway (NGINX) y Control de Trafico}
-El gateway implementa funciones clave:
+\section{Gateway (Spring Cloud Gateway) y Control de Trafico}
+El gateway implementa funciones clave como microservicio Spring Boot:
 \begin{itemize}[leftmargin=*]
-    \item Balanceo con \texttt{least\_conn} para auth e ingestion.
-    \item \texttt{auth\_request} contra \texttt{/api/auth/validate} para proteger rutas privadas.
-    \item Limitacion de tasa (rate limiting) por IP.
-    \item Reglas WAF basicas para bloquear patrones de inyeccion y exploracion maliciosa.
-    \item Propagacion de \texttt{X-Correlation-ID} para observabilidad transversal.
+    \item Balanceo y ruteo dinámico para authservice, data-ingestion-service y kpi-engine.
+    \item Filtro global de autenticación y autorización JWT.
+    \item Limitación de tasa (rate limiting) por IP.
+    \item Reglas WAF básicas para bloquear patrones de inyección y exploración maliciosa.
+    \item Propagación de \texttt{X-Correlation-ID} para observabilidad transversal.
+    \item Pruebas automatizadas (más de 100 tests) ejecutadas en Jenkins.
 \end{itemize}
 
-Esta capa mejora seguridad, resiliencia y trazabilidad operacional del sistema.
+Esta capa mejora seguridad, resiliencia y trazabilidad operacional del sistema. El cambio de NGINX a Spring Cloud Gateway permite mayor flexibilidad, integración con el ecosistema Spring y automatización de pruebas.
 
 \section{Docker Compose: Estado y Justificacion}
 \subsection{Aspectos positivos del disenio actual}
@@ -267,7 +286,7 @@ RNF-06 & Hash de contrasenas con BCrypt. & Completo & PasswordEncoder BCrypt con
 RNF-07 & Aislamiento de bases por microservicio. & Completo & postgres auth/events/kpi separados en Compose. \\
 RNF-08 & Tolerancia a fallos con Circuit Breaker. & Completo & Resilience4j configurado en conectores de ingesta. \\
 RNF-09 & Logs estructurados para monitoreo. & Completo & Logback + patron consistente y niveles definidos. \\
-RNF-10 & Trazabilidad por Correlation ID. & Completo & Filtro de correlacion + propagacion en NGINX. \\
+RNF-10 & Trazabilidad por Correlation ID. & Completo & Filtro de correlación + propagación en Spring Cloud Gateway. \\
 RNF-11 & Metricas de salud/rendimiento con Actuator. & Completo & Dependencias Actuator habilitadas en los servicios principales. \\
 RNF-12 & Despliegue local con Docker Compose. & Completo & Stack ejecutable con docker-compose.yml. \\
 RNF-13 & Mantenibilidad y separacion de responsabilidades. & Completo & Arquitectura por capas y microservicios desacoplados. \\
