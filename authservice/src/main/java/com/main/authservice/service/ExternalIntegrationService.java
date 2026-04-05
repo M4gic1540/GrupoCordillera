@@ -1,12 +1,10 @@
 package com.main.authservice.service;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.time.Duration;
+import com.main.authservice.external.ConnectorFactory;
+import com.main.authservice.external.ExternalConnector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,15 +26,12 @@ public class ExternalIntegrationService {
 
     private final ExternalIntegrationsProperties properties;
     private final ObjectMapper objectMapper;
-    private final HttpClient httpClient;
     private final CircuitBreaker externalCallsCircuitBreaker;
 
     public ExternalIntegrationService(ExternalIntegrationsProperties properties) {
         this.properties = properties;
         this.objectMapper = new ObjectMapper();
-        this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(3))
-                .build();
+
 
         CircuitBreakerConfig circuitBreakerConfig = CircuitBreakerConfig.custom()
                 .failureRateThreshold(properties.getFailureRateThreshold())
@@ -49,13 +44,12 @@ public class ExternalIntegrationService {
         this.externalCallsCircuitBreaker = CircuitBreaker.of("auth-external-calls", circuitBreakerConfig);
     }
 
-    public void notifyUserRegistered(User user) {
+    public void notifyUserRegistered(User user, String connectorType) {
         if (!properties.isEnabled()) {
             return;
         }
-
         try {
-            externalCallsCircuitBreaker.executeRunnable(() -> doNotifyUserRegistered(user));
+            externalCallsCircuitBreaker.executeRunnable(() -> doNotifyUserRegistered(user, connectorType));
         } catch (CallNotPermittedException ex) {
             logger.warn("Circuit breaker abierto para integraciones externas, se omite notificación de registro userId={}", user.getId());
         } catch (Exception ex) {
@@ -74,26 +68,11 @@ public class ExternalIntegrationService {
         return status;
     }
 
-    private void doNotifyUserRegistered(User user) {
-        URI endpoint = URI.create(properties.getBaseUrl() + properties.getUserRegisteredPath());
-
-        HttpRequest request = HttpRequest.newBuilder(endpoint)
-                .header("Content-Type", "application/json")
-                .timeout(Duration.ofSeconds(5))
-                .POST(HttpRequest.BodyPublishers.ofString(buildPayload(user)))
-                .build();
-
-        try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            int statusCode = response.statusCode();
-            if (statusCode >= 200 && statusCode < 300) {
-                logger.info("Integración externa de registro ejecutada para userId={} status={}", user.getId(), statusCode);
-                return;
-            }
-            throw new IllegalStateException("External endpoint returned status=" + statusCode);
-        } catch (Exception ex) {
-            throw new RuntimeException("No fue posible notificar registro a integraciones externas", ex);
-        }
+    private void doNotifyUserRegistered(User user, String connectorType) {
+        ExternalConnector connector = ConnectorFactory.createConnector(connectorType);
+        logger.info("Usando conector externo tipo {} para userId={}", connector.getType(), user.getId());
+        connector.connect();
+        // Aquí podrías llamar métodos como connector.sendData(user) si los defines en la interfaz
     }
 
     private String buildPayload(User user) {
