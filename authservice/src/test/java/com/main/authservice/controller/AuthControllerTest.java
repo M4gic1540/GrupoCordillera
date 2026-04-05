@@ -1,5 +1,22 @@
 package com.main.authservice.controller;
 
+import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.main.authservice.dto.AuthResponse;
 import com.main.authservice.dto.LoginRequest;
@@ -9,21 +26,6 @@ import com.main.authservice.exception.ApiExceptionHandler;
 import com.main.authservice.model.Role;
 import com.main.authservice.security.JwtService;
 import com.main.authservice.service.AuthService;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class AuthControllerTest {
 
@@ -175,6 +177,112 @@ class AuthControllerTest {
 
         mockMvc().perform(get("/api/auth/validate")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer boom-token"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void registerShouldCallServiceWithPayload() throws Exception {
+        RegisterRequest request = new RegisterRequest();
+        request.setEmail("user@test.com");
+        request.setPassword("Password123");
+        when(authService.register(any(RegisterRequest.class))).thenReturn(authResponse(10L, "user@test.com"));
+
+        mockMvc().perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+
+        verify(authService).register(any(RegisterRequest.class));
+    }
+
+    @Test
+    void loginShouldCallServiceWithPayload() throws Exception {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("user@test.com");
+        request.setPassword("Password123");
+        when(authService.login(any(LoginRequest.class))).thenReturn(authResponse(11L, "user@test.com"));
+
+        mockMvc().perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        verify(authService).login(any(LoginRequest.class));
+    }
+
+    @Test
+    void refreshShouldCallServiceWithPayload() throws Exception {
+        RefreshRequest request = new RefreshRequest();
+        request.setRefreshToken("refresh-token");
+        when(authService.refresh(any(RefreshRequest.class))).thenReturn(authResponse(12L, "ref@test.com"));
+
+        mockMvc().perform(post("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        verify(authService).refresh(any(RefreshRequest.class));
+    }
+
+    @Test
+    void registerShouldReturnBadRequestWhenEmailFormatInvalid() throws Exception {
+        RegisterRequest request = new RegisterRequest();
+        request.setEmail("invalid-email");
+        request.setPassword("Password123");
+
+        mockMvc().perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Validation failed"));
+
+        verify(authService, never()).register(any(RegisterRequest.class));
+    }
+
+    @Test
+    void loginShouldReturnBadRequestWhenPasswordBlank() throws Exception {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("user@test.com");
+        request.setPassword("   ");
+
+        mockMvc().perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Validation failed"));
+
+        verify(authService, never()).login(any(LoginRequest.class));
+    }
+
+    @Test
+    void refreshShouldReturnBadRequestWhenTokenTooLong() throws Exception {
+        RefreshRequest request = new RefreshRequest();
+        request.setRefreshToken("a".repeat(513));
+
+        mockMvc().perform(post("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Validation failed"));
+
+        verify(authService, never()).refresh(any(RefreshRequest.class));
+    }
+
+    @Test
+    void validateShouldReturnUnauthorizedWhenBearerTokenIsEmpty() throws Exception {
+        when(jwtService.isTokenValid(eq(""))).thenReturn(false);
+
+        mockMvc().perform(get("/api/auth/validate")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer "))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void validateShouldReturnUnauthorizedWhenBearerTokenIsOnlySpaces() throws Exception {
+        when(jwtService.isTokenValid(eq("   "))).thenReturn(false);
+
+        mockMvc().perform(get("/api/auth/validate")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer    "))
                 .andExpect(status().isUnauthorized());
     }
 

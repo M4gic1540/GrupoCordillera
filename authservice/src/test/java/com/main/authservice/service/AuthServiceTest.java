@@ -1,5 +1,31 @@
 package com.main.authservice.service;
 
+import java.time.Instant;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import static org.mockito.ArgumentMatchers.any;
+import org.mockito.Mock;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.main.authservice.dto.AuthResponse;
 import com.main.authservice.dto.LoginRequest;
 import com.main.authservice.dto.RefreshRequest;
@@ -13,30 +39,6 @@ import com.main.authservice.model.User;
 import com.main.authservice.repository.RefreshTokenRepository;
 import com.main.authservice.repository.UserRepository;
 import com.main.authservice.security.JwtService;
-import java.time.Instant;
-import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -277,5 +279,229 @@ class AuthServiceTest {
         verify(refreshTokenRepository).save(tokenCaptor.capture());
         assertFalse(tokenCaptor.getValue().isRevoked());
         assertNotNull(tokenCaptor.getValue().getExpiresAt());
+    }
+
+    @Test
+    void registerShouldNormalizeEmailBeforeExistsCheck() {
+        RegisterRequest request = new RegisterRequest();
+        request.setEmail("  MIXED@TEST.COM  ");
+        request.setPassword("Password123");
+
+        when(userRepository.existsByEmail("mixed@test.com")).thenReturn(true);
+
+        assertThrows(ConflictException.class, () -> authService.register(request));
+        verify(userRepository).existsByEmail("mixed@test.com");
+    }
+
+    @Test
+    void registerShouldSetDefaultRoleUser() {
+        RegisterRequest request = new RegisterRequest();
+        request.setEmail("role@test.com");
+        request.setPassword("Password123");
+
+        when(userRepository.existsByEmail("role@test.com")).thenReturn(false);
+        when(passwordEncoder.encode("Password123")).thenReturn("hash");
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(70L);
+            return u;
+        });
+        when(jwtService.generateAccessToken("role@test.com")).thenReturn("access");
+        when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(inv -> {
+            RefreshToken t = inv.getArgument(0);
+            t.setToken("refresh");
+            return t;
+        });
+
+        AuthResponse response = authService.register(request);
+
+        assertEquals(Role.USER, response.getRole());
+    }
+
+    @Test
+    void registerShouldGenerateAccessTokenUsingSavedUserEmail() {
+        RegisterRequest request = new RegisterRequest();
+        request.setEmail("token@test.com");
+        request.setPassword("Password123");
+
+        when(userRepository.existsByEmail("token@test.com")).thenReturn(false);
+        when(passwordEncoder.encode("Password123")).thenReturn("hash");
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(80L);
+            return u;
+        });
+        when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(inv -> {
+            RefreshToken t = inv.getArgument(0);
+            t.setToken("refresh");
+            return t;
+        });
+        when(jwtService.generateAccessToken("token@test.com")).thenReturn("access");
+
+        authService.register(request);
+
+        verify(jwtService).generateAccessToken("token@test.com");
+    }
+
+    @Test
+    void loginShouldNormalizeEmailBeforeAuthentication() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("  LOGIN@TEST.COM ");
+        request.setPassword("Password123");
+
+        User user = new User();
+        user.setId(90L);
+        user.setEmail("login@test.com");
+        user.setRole(Role.USER);
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(org.mockito.Mockito.mock(Authentication.class));
+        when(userRepository.findByEmail("login@test.com")).thenReturn(Optional.of(user));
+        when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(inv -> {
+            RefreshToken t = inv.getArgument(0);
+            t.setToken("refresh");
+            return t;
+        });
+        when(jwtService.generateAccessToken("login@test.com")).thenReturn("access");
+
+        authService.login(request);
+
+        verify(userRepository).findByEmail("login@test.com");
+    }
+
+    @Test
+    void loginShouldGenerateAccessTokenForAuthenticatedUser() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("ok@test.com");
+        request.setPassword("Password123");
+
+        User user = new User();
+        user.setId(91L);
+        user.setEmail("ok@test.com");
+        user.setRole(Role.USER);
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(org.mockito.Mockito.mock(Authentication.class));
+        when(userRepository.findByEmail("ok@test.com")).thenReturn(Optional.of(user));
+        when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(inv -> {
+            RefreshToken t = inv.getArgument(0);
+            t.setToken("refresh");
+            return t;
+        });
+        when(jwtService.generateAccessToken("ok@test.com")).thenReturn("access");
+
+        authService.login(request);
+
+        verify(jwtService).generateAccessToken("ok@test.com");
+    }
+
+    @Test
+    void refreshShouldPersistRevokedOldTokenBeforeNewToken() {
+        RefreshRequest request = new RefreshRequest();
+        request.setRefreshToken("valid-token");
+
+        User user = new User();
+        user.setId(100L);
+        user.setEmail("refresh-order@test.com");
+        user.setRole(Role.USER);
+
+        RefreshToken oldToken = new RefreshToken();
+        oldToken.setToken("valid-token");
+        oldToken.setUser(user);
+        oldToken.setExpiresAt(Instant.now().plusSeconds(200));
+        oldToken.setRevoked(false);
+
+        when(refreshTokenRepository.findByTokenAndRevokedFalse("valid-token")).thenReturn(Optional.of(oldToken));
+        when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(inv -> {
+            RefreshToken t = inv.getArgument(0);
+            if (!"valid-token".equals(t.getToken())) {
+                t.setToken("new-token");
+            }
+            return t;
+        });
+        when(jwtService.generateAccessToken("refresh-order@test.com")).thenReturn("access");
+
+        authService.refresh(request);
+
+        org.mockito.InOrder inOrder = inOrder(refreshTokenRepository);
+        inOrder.verify(refreshTokenRepository).save(oldToken);
+        inOrder.verify(refreshTokenRepository).save(any(RefreshToken.class));
+    }
+
+    @Test
+    void refreshShouldGenerateTokenUsingOwnerEmail() {
+        RefreshRequest request = new RefreshRequest();
+        request.setRefreshToken("valid-token");
+
+        User user = new User();
+        user.setId(101L);
+        user.setEmail("owner@test.com");
+        user.setRole(Role.USER);
+
+        RefreshToken oldToken = new RefreshToken();
+        oldToken.setToken("valid-token");
+        oldToken.setUser(user);
+        oldToken.setExpiresAt(Instant.now().plusSeconds(200));
+        oldToken.setRevoked(false);
+
+        when(refreshTokenRepository.findByTokenAndRevokedFalse("valid-token")).thenReturn(Optional.of(oldToken));
+        when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(inv -> {
+            RefreshToken t = inv.getArgument(0);
+            if (!"valid-token".equals(t.getToken())) {
+                t.setToken("new-refresh");
+            }
+            return t;
+        });
+        when(jwtService.generateAccessToken("owner@test.com")).thenReturn("access");
+
+        authService.refresh(request);
+
+        verify(jwtService, times(1)).generateAccessToken("owner@test.com");
+    }
+
+    @Test
+    void meShouldReturnCreatedAtValueFromEntity() {
+        Instant createdAt = Instant.now().minusSeconds(3600);
+        User user = new User();
+        user.setId(110L);
+        user.setEmail("created@test.com");
+        user.setRole(Role.ADMIN);
+        user.setCreatedAt(createdAt);
+
+        when(userRepository.findByEmail("created@test.com")).thenReturn(Optional.of(user));
+
+        UserMeResponse response = authService.me("created@test.com");
+
+        assertEquals(createdAt, response.getCreatedAt());
+        assertEquals(Role.ADMIN, response.getRole());
+    }
+
+    @Test
+    void loginShouldSaveActiveRefreshToken() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("active@test.com");
+        request.setPassword("Password123");
+
+        User user = new User();
+        user.setId(120L);
+        user.setEmail("active@test.com");
+        user.setRole(Role.USER);
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(org.mockito.Mockito.mock(Authentication.class));
+        when(userRepository.findByEmail("active@test.com")).thenReturn(Optional.of(user));
+        when(jwtService.generateAccessToken("active@test.com")).thenReturn("access");
+        when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(inv -> {
+            RefreshToken t = inv.getArgument(0);
+            t.setToken("refresh");
+            return t;
+        });
+
+        authService.login(request);
+
+        ArgumentCaptor<RefreshToken> tokenCaptor = ArgumentCaptor.forClass(RefreshToken.class);
+        verify(refreshTokenRepository).save(tokenCaptor.capture());
+        assertFalse(tokenCaptor.getValue().isRevoked());
+        assertEquals(user, tokenCaptor.getValue().getUser());
     }
 }
