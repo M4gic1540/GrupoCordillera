@@ -1,0 +1,144 @@
+2026-04-05 00:30:58.724 [main] INFO  [cid:none] c.m.a.AuthserviceApplication - Starting AuthserviceApplication v0.0.1-SNAPSHOT using Java 25.0.2 with PID 1 (/app/app.jar started by root in /app)
+2026-04-05 00:30:58.812 [main] INFO  [cid:none] c.m.a.AuthserviceApplication - The following 1 profile is active: "postgres"
+2026-04-05 00:30:59.804 [main] INFO  [cid:none] c.m.a.AuthserviceApplication - Starting AuthserviceApplication v0.0.1-SNAPSHOT using Java 25.0.2 with PID 1 (/app/app.jar started by root in /app)
+2026-04-05 00:30:59.831 [main] INFO  [cid:none] c.m.a.AuthserviceApplication - The following 1 profile is active: "postgres"
+2026-04-05 00:31:03.187 [background-preinit] INFO  [cid:none] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.0.1.Final
+2026-04-05 00:31:03.262 [background-preinit] INFO  [cid:none] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.0.1.Final
+2026-04-05 00:31:09.177 [main] INFO  [cid:none] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-05 00:31:09.182 [main] INFO  [cid:none] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-05 00:31:09.479 [main] INFO  [cid:none] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 234 ms. Found 2 JPA repository interfaces.
+2026-04-05 00:31:09.503 [main] INFO  [cid:none] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 249 ms. Found 2 JPA repository interfaces.
+2026-04-05 00:31:14.056 [main] INFO  [cid:none] o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-04-05 00:31:14.112 [main] INFO  [cid:none] o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-04-05 00:31:14.160 [main] INFO  [cid:none] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-05 00:31:14.160 [main] INFO  [cid:none] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-05 00:31:14.172 [main] INFO  [cid:none] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-05 00:31:14.175 [main] INFO  [cid:none] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-05 00:31:14.176 [main] INFO  [cid:none] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-05 00:31:14.179 [main] INFO  [cid:none] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-05 00:31:14.367 [main] INFO  [cid:none] o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 14858 ms
+2026-04-05 00:31:14.386 [main] INFO  [cid:none] o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 14121 ms
+2026-04-05 00:31:15.873 [main] INFO  [cid:none] org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-05 00:31:15.937 [main] INFO  [cid:none] org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-05 00:31:16.285 [main] INFO  [cid:none] org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.2.7.Final
+2026-04-05 00:31:16.487 [main] INFO  [cid:none] org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.2.7.Final
+2026-04-05 00:31:22.176 [main] INFO  [cid:none] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-05 00:31:22.448 [main] INFO  [cid:none] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-05 00:31:22.510 [main] INFO  [cid:none] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-05 00:31:22.708 [main] INFO  [cid:none] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-05 00:31:23.676 [main] INFO  [cid:none] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5e663ab
+2026-04-05 00:31:23.681 [main] INFO  [cid:none] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-05 00:31:23.840 [main] INFO  [cid:none] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5e663ab
+2026-04-05 00:31:23.846 [main] INFO  [cid:none] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-05 00:31:24.208 [main] INFO  [cid:none] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://postgres:5432/authservice_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 15.17
+	Default catalog/schema: authservice_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-05 00:31:24.265 [main] INFO  [cid:none] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://postgres:5432/authservice_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 15.17
+	Default catalog/schema: authservice_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-05 00:31:29.508 [main] INFO  [cid:none] org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-05 00:31:30.095 [main] INFO  [cid:none] org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-05 00:31:30.239 [main] INFO  [cid:none] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-05 00:31:30.505 [main] INFO  [cid:none] o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-05 00:31:30.576 [main] INFO  [cid:none] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-05 00:31:30.934 [main] INFO  [cid:none] o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-05 00:31:34.574 [main] WARN  [cid:none] o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-05 00:31:34.780 [main] WARN  [cid:none] o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-05 00:31:39.713 [main] INFO  [cid:none] o.s.b.a.e.web.EndpointLinksResolver - Exposing 4 endpoints beneath base path '/actuator'
+2026-04-05 00:31:39.820 [main] INFO  [cid:none] o.s.b.a.e.web.EndpointLinksResolver - Exposing 4 endpoints beneath base path '/actuator'
+2026-04-05 00:31:40.048 [main] INFO  [cid:none] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-05 00:31:40.158 [main] INFO  [cid:none] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-05 00:31:40.183 [main] INFO  [cid:none] o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-04-05 00:31:40.228 [main] INFO  [cid:none] c.m.a.AuthserviceApplication - Started AuthserviceApplication in 46.253 seconds (process running for 52.29)
+2026-04-05 00:31:40.242 [main] INFO  [cid:none] o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-04-05 00:31:40.280 [main] INFO  [cid:none] c.m.a.AuthserviceApplication - Started AuthserviceApplication in 47.016 seconds (process running for 52.342)
+2026-04-05 01:37:10.525 [main] INFO  [cid:none] c.m.a.AuthserviceApplication - Starting AuthserviceApplication v0.0.1-SNAPSHOT using Java 25.0.2 with PID 1 (/app/app.jar started by root in /app)
+2026-04-05 01:37:10.619 [main] INFO  [cid:none] c.m.a.AuthserviceApplication - The following 1 profile is active: "postgres"
+2026-04-05 01:37:10.789 [main] INFO  [cid:none] c.m.a.AuthserviceApplication - Starting AuthserviceApplication v0.0.1-SNAPSHOT using Java 25.0.2 with PID 1 (/app/app.jar started by root in /app)
+2026-04-05 01:37:10.815 [main] INFO  [cid:none] c.m.a.AuthserviceApplication - The following 1 profile is active: "postgres"
+2026-04-05 01:37:15.380 [background-preinit] INFO  [cid:none] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.0.1.Final
+2026-04-05 01:37:15.848 [background-preinit] INFO  [cid:none] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.0.1.Final
+2026-04-05 01:37:23.698 [main] INFO  [cid:none] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-05 01:37:24.022 [main] INFO  [cid:none] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-05 01:37:24.129 [main] INFO  [cid:none] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 366 ms. Found 2 JPA repository interfaces.
+2026-04-05 01:37:24.412 [main] INFO  [cid:none] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 312 ms. Found 2 JPA repository interfaces.
+2026-04-05 01:37:33.563 [main] INFO  [cid:none] o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-04-05 01:37:33.627 [main] INFO  [cid:none] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-05 01:37:33.638 [main] INFO  [cid:none] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-05 01:37:33.639 [main] INFO  [cid:none] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-05 01:37:33.776 [main] INFO  [cid:none] o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 22579 ms
+2026-04-05 01:37:33.845 [main] INFO  [cid:none] o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-04-05 01:37:33.965 [main] INFO  [cid:none] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-05 01:37:33.971 [main] INFO  [cid:none] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-05 01:37:33.977 [main] INFO  [cid:none] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-05 01:37:34.350 [main] INFO  [cid:none] o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 22797 ms
+2026-04-05 01:37:38.596 [main] INFO  [cid:none] org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-05 01:37:38.873 [main] INFO  [cid:none] org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-05 01:37:39.241 [main] INFO  [cid:none] org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.2.7.Final
+2026-04-05 01:37:39.436 [main] INFO  [cid:none] org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.2.7.Final
+2026-04-05 01:37:43.855 [main] INFO  [cid:none] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-05 01:37:44.090 [main] INFO  [cid:none] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-05 01:37:44.446 [main] INFO  [cid:none] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-05 01:37:44.564 [main] INFO  [cid:none] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-05 01:37:46.176 [main] INFO  [cid:none] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5e663ab
+2026-04-05 01:37:46.183 [main] INFO  [cid:none] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-05 01:37:46.463 [main] INFO  [cid:none] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@152dbf8e
+2026-04-05 01:37:46.483 [main] INFO  [cid:none] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-05 01:37:48.813 [main] INFO  [cid:none] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://postgres:5432/authservice_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 15.17
+	Default catalog/schema: authservice_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-05 01:37:48.826 [main] INFO  [cid:none] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://postgres:5432/authservice_db]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 15.17
+	Default catalog/schema: authservice_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-05 01:37:53.193 [main] INFO  [cid:none] org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-05 01:37:53.215 [main] INFO  [cid:none] org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-05 01:37:53.554 [main] INFO  [cid:none] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-05 01:37:53.561 [main] INFO  [cid:none] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-05 01:37:54.064 [main] INFO  [cid:none] o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-05 01:37:54.115 [main] INFO  [cid:none] o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-05 01:37:59.964 [main] WARN  [cid:none] o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-05 01:38:00.172 [main] WARN  [cid:none] o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-05 01:38:13.107 [main] INFO  [cid:none] o.s.b.a.e.web.EndpointLinksResolver - Exposing 4 endpoints beneath base path '/actuator'
+2026-04-05 01:38:13.207 [main] INFO  [cid:none] o.s.b.a.e.web.EndpointLinksResolver - Exposing 4 endpoints beneath base path '/actuator'
+2026-04-05 01:38:13.689 [main] INFO  [cid:none] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-05 01:38:13.730 [main] INFO  [cid:none] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-05 01:38:13.882 [main] INFO  [cid:none] o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-04-05 01:38:13.927 [main] INFO  [cid:none] o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-04-05 01:38:13.959 [main] INFO  [cid:none] c.m.a.AuthserviceApplication - Started AuthserviceApplication in 72.393 seconds (process running for 77.539)
+2026-04-05 01:38:14.000 [main] INFO  [cid:none] c.m.a.AuthserviceApplication - Started AuthserviceApplication in 72.418 seconds (process running for 77.579)
