@@ -25,6 +25,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Servicio central de autenticacion.
+ *
+ * <p>Orquesta registro, login, refresh token y consulta de perfil del usuario autenticado,
+ * delegando persistencia en repositorios y emision de access token en {@link JwtService}.</p>
+ */
 @Service
 public class AuthService {
 
@@ -54,6 +60,9 @@ public class AuthService {
         this.refreshTokenExpirationMillis = refreshTokenExpirationMillis;
     }
 
+    /**
+     * Registra un nuevo usuario y retorna el par de tokens inicial.
+     */
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         String email = request.getEmail().trim().toLowerCase();
@@ -74,6 +83,9 @@ public class AuthService {
         return buildAuthResponse(savedUser, refreshToken.getToken());
     }
 
+    /**
+     * Autentica credenciales, revoca refresh tokens previos y emite un nuevo par de tokens.
+     */
     @Transactional
     public AuthResponse login(LoginRequest request) {
         String email = request.getEmail().trim().toLowerCase();
@@ -93,6 +105,9 @@ public class AuthService {
         return buildAuthResponse(user, refreshToken.getToken());
     }
 
+    /**
+     * Rota refresh token: invalida el token recibido y crea uno nuevo para el mismo usuario.
+     */
     @Transactional
     public AuthResponse refresh(RefreshRequest request) {
         logger.info("Refresh token flow started");
@@ -115,6 +130,9 @@ public class AuthService {
         return buildAuthResponse(user, newToken.getToken());
     }
 
+    /**
+     * Devuelve el perfil basico del usuario autenticado identificado por email.
+     */
     @Transactional(readOnly = true)
     public UserMeResponse me(String email) {
         logger.debug("Fetching profile for email={}", email);

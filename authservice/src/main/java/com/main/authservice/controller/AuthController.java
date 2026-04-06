@@ -22,6 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+/**
+ * Controlador REST para operaciones de autenticacion.
+ */
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Authentication", description = "Endpoints for register, login and token refresh")
@@ -37,6 +40,9 @@ public class AuthController {
         this.jwtService = jwtService;
     }
 
+    /**
+     * Endpoint de registro de usuario.
+     */
     @PostMapping("/register")
     @Operation(summary = "Register user", description = "Creates a new user and returns access and refresh tokens.")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -46,6 +52,9 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     * Endpoint de login con email y password.
+     */
     @PostMapping("/login")
     @Operation(summary = "Login user", description = "Authenticates a user and returns access and refresh tokens.")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
@@ -55,6 +64,9 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Endpoint de renovacion de token de acceso mediante refresh token valido.
+     */
     @PostMapping("/refresh")
     @Operation(summary = "Refresh access token", description = "Generates a new token pair using a valid refresh token.")
     public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshRequest request) {
@@ -64,6 +76,9 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Valida un access token recibido en el header Authorization.
+     */
     @GetMapping("/validate")
     @Operation(summary = "Validate access token", description = "Validates JWT token for gateway auth request checks.")
     public ResponseEntity<Void> validateAccessToken(

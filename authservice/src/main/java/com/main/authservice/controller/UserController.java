@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controlador para recursos de usuario autenticado.
+ */
 @RestController
 @RequestMapping("/api/users")
 @Tag(name = "Users", description = "Endpoints for authenticated user data")
@@ -26,12 +29,15 @@ public class UserController {
         this.authService = authService;
     }
 
-    @GetMapping("/me")
-    @Operation(
+    /**
+     * Retorna los datos del usuario actualmente autenticado.
+     */
+        @GetMapping("/me")
+        @Operation(
             summary = "Get authenticated user",
             description = "Returns current authenticated user profile.",
             security = @SecurityRequirement(name = "bearerAuth")
-    )
+        )
     public ResponseEntity<UserMeResponse> me(Authentication authentication) {
         logger.debug("User profile requested for principal={}", authentication.getName());
         UserMeResponse response = authService.me(authentication.getName());
