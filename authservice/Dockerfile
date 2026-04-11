@@ -1,4 +1,4 @@
-FROM eclipse-temurin:25-jdk AS builder
+FROM eclipse-temurin:17-jdk AS builder
 WORKDIR /app
 
 COPY pom.xml ./
@@ -6,14 +6,13 @@ COPY .mvn ./.mvn
 COPY mvnw ./
 RUN chmod +x mvnw
 
-# Resolve dependencies first to improve Docker layer caching.
 RUN ./mvnw -q -DskipTests dependency:go-offline
 
 COPY src ./src
 
-RUN ./mvnw -DskipTests clean package
+RUN ./mvnw -q -DskipTests clean package
 
-FROM eclipse-temurin:25-jre
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 
 COPY --from=builder /app/target/*.jar app.jar

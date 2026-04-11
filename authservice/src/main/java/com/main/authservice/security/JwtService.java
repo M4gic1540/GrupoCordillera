@@ -16,6 +16,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Servicio de utilidades JWT: emision, extraccion de subject y validacion.
+ */
 @Service
 public class JwtService {
 
@@ -30,10 +33,16 @@ public class JwtService {
         this.accessTokenExpirationMillis = accessTokenExpirationMillis;
     }
 
+    /**
+     * Genera un access token a partir de un UserDetails autenticado.
+     */
     public String generateAccessToken(UserDetails userDetails) {
         return generateAccessToken(userDetails.getUsername());
     }
 
+    /**
+     * Genera un access token firmado para un subject (email/username).
+     */
     public String generateAccessToken(String subject) {
         return Jwts.builder()
                 .claims(new HashMap<>(defaultClaims()))
@@ -44,15 +53,24 @@ public class JwtService {
                 .compact();
     }
 
+    /**
+     * Extrae el subject desde un JWT firmado.
+     */
     public String extractSubject(String token) {
         return extractAllClaims(token).getSubject();
     }
 
+    /**
+     * Valida token comparando subject y expiracion contra un UserDetails.
+     */
     public boolean isTokenValid(String token, UserDetails userDetails) {
         String subject = extractSubject(token);
         return subject.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
+    /**
+     * Valida token solo por expiracion y firma.
+     */
     public boolean isTokenValid(String token) {
         return !isTokenExpired(token);
     }

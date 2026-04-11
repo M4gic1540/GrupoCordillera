@@ -15,6 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.main.dataingestion.config.SourceSystemsProperties;
 import com.main.dataingestion.connector.ConnectorFactory;
 import com.main.dataingestion.connector.SourceConnector;
+import com.main.dataingestion.domain.IngestionEvent;
+import com.main.dataingestion.domain.SyncRun;
 import com.main.dataingestion.repository.IngestionEventRepository;
 import com.main.dataingestion.repository.SyncRunRepository;
 
@@ -32,12 +34,12 @@ class IngestionServiceTest {
         SyncRunRepository syncRunRepository = Mockito.mock(SyncRunRepository.class);
         TestKpiNotificationService kpiService = new TestKpiNotificationService();
 
-        JsonNode p1 = OBJECT_MAPPER.readTree("{\"id\":1}");
-        JsonNode p2 = OBJECT_MAPPER.readTree("{\"id\":2}");
+        JsonNode p1 = OBJECT_MAPPER.readTree("{\"id\":1,\"type\":\"created\",\"source\":\"" + source + "\"}");
+        JsonNode p2 = OBJECT_MAPPER.readTree("{\"id\":2,\"type\":\"updated\",\"source\":\"" + source + "\"}");
 
         when(connector.fetchBatch()).thenReturn(List.of(p1, p2));
-        when(eventRepository.saveAll(any())).thenAnswer(inv -> inv.getArgument(0));
-        when(syncRunRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(eventRepository.saveAll(org.mockito.ArgumentMatchers.<Iterable<IngestionEvent>>any())).thenAnswer(inv -> inv.getArgument(0));
+        when(syncRunRepository.save(any(SyncRun.class))).thenAnswer(inv -> inv.getArgument(0));
 
         ConnectorFactory connectorFactory = connectorFactoryStub(source, connector);
 
@@ -59,8 +61,8 @@ class IngestionServiceTest {
         TestKpiNotificationService kpiService = new TestKpiNotificationService();
 
         when(connector.fetchBatch()).thenReturn(List.of());
-        when(eventRepository.saveAll(any())).thenAnswer(inv -> inv.getArgument(0));
-        when(syncRunRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(eventRepository.saveAll(org.mockito.ArgumentMatchers.<Iterable<IngestionEvent>>any())).thenAnswer(inv -> inv.getArgument(0));
+        when(syncRunRepository.save(any(SyncRun.class))).thenAnswer(inv -> inv.getArgument(0));
 
         ConnectorFactory connectorFactory = connectorFactoryStub(source, connector);
 

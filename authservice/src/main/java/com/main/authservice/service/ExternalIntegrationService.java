@@ -20,6 +20,9 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 
 @Service
+/**
+ * Servicio para notificaciones a integraciones externas usando Factory Method y Circuit Breaker.
+ */
 public class ExternalIntegrationService {
 
     private static final Logger logger = LoggerFactory.getLogger(ExternalIntegrationService.class);
@@ -44,6 +47,9 @@ public class ExternalIntegrationService {
         this.externalCallsCircuitBreaker = CircuitBreaker.of("auth-external-calls", circuitBreakerConfig);
     }
 
+    /**
+     * Notifica registro de usuario hacia un conector externo segun tipo.
+     */
     public void notifyUserRegistered(User user, String connectorType) {
         if (!properties.isEnabled()) {
             return;
@@ -57,6 +63,9 @@ public class ExternalIntegrationService {
         }
     }
 
+    /**
+     * Retorna metricas y estado actual del circuit breaker de llamadas externas.
+     */
     public Map<String, Object> getCircuitBreakerStatus() {
         Map<String, Object> status = new HashMap<>();
         status.put("name", externalCallsCircuitBreaker.getName());

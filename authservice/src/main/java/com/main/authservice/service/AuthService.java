@@ -1,10 +1,13 @@
 package com.main.authservice.service;
 
 import com.main.authservice.dto.AuthResponse;
+import com.main.authservice.dto.BootstrapAdminRequest;
 import com.main.authservice.dto.LoginRequest;
 import com.main.authservice.dto.RefreshRequest;
 import com.main.authservice.dto.RegisterRequest;
+import com.main.authservice.dto.UpdateUserRequest;
 import com.main.authservice.dto.UserMeResponse;
+import com.main.authservice.exception.NotFoundException;
 import com.main.authservice.exception.ConflictException;
 import com.main.authservice.exception.UnauthorizedException;
 import com.main.authservice.model.RefreshToken;
@@ -16,6 +19,7 @@ import com.main.authservice.security.JwtService;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +29,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Servicio central de autenticacion.
+ *
+ * <p>Orquesta registro, login, refresh token y consulta de perfil del usuario autenticado,
+ * delegando persistencia en repositorios y emision de access token en {@link JwtService}.</p>
+ */
 @Service
 public class AuthService {
 
@@ -54,6 +64,9 @@ public class AuthService {
         this.refreshTokenExpirationMillis = refreshTokenExpirationMillis;
     }
 
+    /**
+     * Registra un nuevo usuario y retorna el par de tokens inicial.
+     */
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         String email = request.getEmail().trim().toLowerCase();
@@ -74,6 +87,32 @@ public class AuthService {
         return buildAuthResponse(savedUser, refreshToken.getToken());
     }
 
+    /**
+     * Crea o promueve el primer administrador del sistema.
+     */
+    @Transactional
+    public AuthResponse bootstrapAdmin(BootstrapAdminRequest request) {
+        if (userRepository.existsByRole(Role.ADMIN)) {
+            throw new ConflictException("Admin already initialized");
+        }
+
+        String email = request.getEmail().trim().toLowerCase();
+        logger.info("Bootstrap admin flow started for email={}", email);
+
+        User user = userRepository.findByEmail(email).orElseGet(User::new);
+        user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setRole(Role.ADMIN);
+
+        User savedUser = userRepository.save(user);
+        RefreshToken refreshToken = createAndSaveRefreshToken(savedUser);
+        logger.info("Bootstrap admin completed for userId={}", savedUser.getId());
+        return buildAuthResponse(savedUser, refreshToken.getToken());
+    }
+
+    /**
+     * Autentica credenciales, revoca refresh tokens previos y emite un nuevo par de tokens.
+     */
     @Transactional
     public AuthResponse login(LoginRequest request) {
         String email = request.getEmail().trim().toLowerCase();
@@ -93,6 +132,9 @@ public class AuthService {
         return buildAuthResponse(user, refreshToken.getToken());
     }
 
+    /**
+     * Rota refresh token: invalida el token recibido y crea uno nuevo para el mismo usuario.
+     */
     @Transactional
     public AuthResponse refresh(RefreshRequest request) {
         logger.info("Refresh token flow started");
@@ -115,11 +157,59 @@ public class AuthService {
         return buildAuthResponse(user, newToken.getToken());
     }
 
+    /**
+     * Devuelve el perfil basico del usuario autenticado identificado por email.
+     */
     @Transactional(readOnly = true)
     public UserMeResponse me(String email) {
         logger.debug("Fetching profile for email={}", email);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UnauthorizedException("User not found"));
+        return toUserMeResponse(user);
+    }
+
+    /**
+     * Actualiza email y password del usuario autenticado.
+     */
+    @Transactional
+    public UserMeResponse actualizarUser(String authenticatedEmail, UpdateUserRequest request) {
+        String currentEmail = authenticatedEmail.trim().toLowerCase();
+        String newEmail = request.getEmail().trim().toLowerCase();
+        logger.info("User update requested for email={}", currentEmail);
+
+        User user = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+
+        if (!currentEmail.equals(newEmail) && userRepository.existsByEmail(newEmail)) {
+            logger.warn("User update rejected, email already exists: {}", newEmail);
+            throw new ConflictException("Email already registered");
+        }
+
+        user.setEmail(newEmail);
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        User updatedUser = userRepository.save(user);
+        logger.info("User updated successfully for userId={}", updatedUser.getId());
+        return toUserMeResponse(updatedUser);
+    }
+
+    /**
+     * Actualiza el rol de un usuario por identificador.
+     */
+    @Transactional
+    public UserMeResponse updateUserRole(Long userId, Role role) {
+        Objects.requireNonNull(userId, "userId is required");
+        Objects.requireNonNull(role, "role is required");
+        logger.info("Role update started for userId={} role={}", userId, role);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        user.setRole(role);
+        User updatedUser = userRepository.save(user);
+        logger.info("Role update successful for userId={} role={}", updatedUser.getId(), updatedUser.getRole());
+        return toUserMeResponse(updatedUser);
+    }
+
+    private UserMeResponse toUserMeResponse(User user) {
         UserMeResponse response = new UserMeResponse();
         response.setId(user.getId());
         response.setEmail(user.getEmail());
