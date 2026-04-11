@@ -40,8 +40,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-authservice_db}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -98,8 +98,8 @@ services:
       EVENTS_DB_USERNAME: ${EVENTS_DB_USERNAME:-postgres}
       EVENTS_DB_PASSWORD: ${EVENTS_DB_PASSWORD:-postgres}
       KPI_ENGINE_BASE_URL: ${KPI_ENGINE_BASE_URL:-http://kpi-engine:8082}
-    ports:
-      - "8081:8081"
+    expose:
+      - "8081"
 
   data-ingestion-service-2:
     build:
@@ -129,8 +129,6 @@ services:
       KPI_DB_URL: jdbc:postgresql://postgres-kpi:5432/${KPI_DB_NAME:-kpi_db}
       KPI_DB_USERNAME: ${KPI_DB_USERNAME:-postgres}
       KPI_DB_PASSWORD: ${KPI_DB_PASSWORD:-postgres}
-    ports:
-      - "8082:8082"
     expose:
       - "8082"
 
