@@ -155,10 +155,15 @@ class AuthControllerTest {
 
     @Test
     void validateShouldReturnOkWhenTokenIsValid() throws Exception {
-        when(jwtService.isTokenValid(eq("valid-token"))).thenReturn(true);
+        String token = "valid-token";
+        String username = "user@test.com";
+        org.springframework.security.core.userdetails.UserDetails userDetails = org.mockito.Mockito.mock(org.springframework.security.core.userdetails.UserDetails.class);
+        when(jwtService.extractSubject(eq(token))).thenReturn(username);
+        when(userDetailsService.loadUserByUsername(eq(username))).thenReturn(userDetails);
+        when(jwtService.isTokenValid(eq(token), eq(userDetails))).thenReturn(true);
 
         mockMvc().perform(get("/api/auth/validate")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer valid-token"))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isOk());
     }
 
