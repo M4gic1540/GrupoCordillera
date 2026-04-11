@@ -31,15 +31,17 @@ class AuthControllerTest {
 
     private final AuthService authService = org.mockito.Mockito.mock(AuthService.class);
     private final JwtService jwtService = org.mockito.Mockito.mock(JwtService.class);
+    private final org.springframework.security.core.userdetails.UserDetailsService userDetailsService = org.mockito.Mockito.mock(org.springframework.security.core.userdetails.UserDetailsService.class);
+    private final String bootstrapAdminToken = "dummy-token";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
 
     private MockMvc mockMvc() {
         validator.afterPropertiesSet();
-        return MockMvcBuilders.standaloneSetup(new AuthController(authService, jwtService))
-                .setControllerAdvice(new ApiExceptionHandler())
-                .setValidator(validator)
-                .build();
+        return MockMvcBuilders.standaloneSetup(new AuthController(authService, jwtService, userDetailsService, bootstrapAdminToken))
+            .setControllerAdvice(new ApiExceptionHandler())
+            .setValidator(validator)
+            .build();
     }
 
     @Test
