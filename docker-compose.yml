@@ -17,6 +17,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    mem_limit: 200m
+    cpus: 0.15
 
   postgres-kpi:
     image: postgres:15
@@ -36,6 +38,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    mem_limit: 200m
+    cpus: 0.15
 
   postgres:
     image: postgres:15
@@ -55,6 +59,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    mem_limit: 200m
+    cpus: 0.15
 
   authservice-1:
     build:
@@ -74,6 +80,8 @@ services:
       - "8080"
     volumes:
       - ./Logs:/app/Logs
+    mem_limit: 300m
+    cpus: 0.25
 
   authservice-2:
     build:
@@ -93,6 +101,8 @@ services:
       - "8080"
     volumes:
       - ./Logs:/app/Logs
+    mem_limit: 300m
+    cpus: 0.25
 
   data-ingestion-service-1:
     build:
@@ -112,6 +122,8 @@ services:
       KPI_ENGINE_BASE_URL: ${KPI_ENGINE_BASE_URL:-http://kpi-engine:8082}
     expose:
       - "8081"
+    mem_limit: 200m
+    cpus: 0.15
 
   data-ingestion-service-2:
     build:
@@ -131,6 +143,8 @@ services:
       KPI_ENGINE_BASE_URL: ${KPI_ENGINE_BASE_URL:-http://kpi-engine:8082}
     expose:
       - "8081"
+    mem_limit: 200m
+    cpus: 0.15
 
   kpi-engine:
     build:
@@ -147,6 +161,8 @@ services:
       KPI_DB_PASSWORD: ${KPI_DB_PASSWORD:-postgres}
     expose:
       - "8082"
+    mem_limit: 200m
+    cpus: 0.15
 
   gateway:
     build:
@@ -171,6 +187,8 @@ services:
       FRONTEND_ORIGIN: http://localhost:5173
     ports:
       - "8080:8080"
+    mem_limit: 200m
+    cpus: 0.15
 
 volumes:
   postgres_data:
