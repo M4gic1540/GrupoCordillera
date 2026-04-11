@@ -12,8 +12,9 @@ pipeline {
 
     environment {
         MAVEN_OPTS = '-Dmaven.test.failure.ignore=false'
-            JWT_SECRET = 'local_test_secret_12345678901234567890123456789012'
-        BOOTSTRAP_ADMIN_TOKEN = 'local_test_bootstrap_token'
+        SPRING_PROFILES_ACTIVE = 'local'
+        JWT_SECRET = 'uk0gORcK9s44BEM5QcB8x5lNLWgaTVsBfc2A1FchfYI='
+        BOOTSTRAP_ADMIN_TOKEN = '6Z5AYKwd2Q+0YcdHpjr+vtF2gzsEcXDgzziQYq1LiqI='
     // Solo si usas perfil postgres:
     // DB_URL = 'jdbc:postgresql://localhost:5432/auth_db'
     // DB_USERNAME = 'postgres'
