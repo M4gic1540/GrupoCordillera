@@ -134,17 +134,25 @@ services:
     expose:
       - "8082"
 
-  api-gateway:
-    image: nginx:1.27-alpine
-    container_name: authservice-api-gateway
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: authservice-spring-gateway
     depends_on:
       - authservice-1
       - authservice-2
       - data-ingestion-service-1
       - data-ingestion-service-2
       - kpi-engine
-    volumes:
-      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    environment:
+      AUTHSERVICE_1_URL: http://authservice-1:8080
+      AUTHSERVICE_2_URL: http://authservice-2:8080
+      INGESTION_1_URL: http://data-ingestion-service-1:8081
+      INGESTION_2_URL: http://data-ingestion-service-2:8081
+      KPI_ENGINE_URL: http://kpi-engine:8082
+      AUTH_VALIDATION_URL: http://authservice-1:8080/api/auth/validate
+      FRONTEND_ORIGIN: http://localhost:5173
     ports:
       - "8080:8080"
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.main.authservice.dto.LoginRequest;
 import com.main.authservice.dto.RefreshRequest;
 import com.main.authservice.dto.RegisterRequest;
+import com.main.authservice.dto.UpdateUserRequest;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -183,6 +185,64 @@ class AuthServiceIntegrationTest {
     @Test
     void meShouldRequireAuthentication() throws Exception {
         mockMvc.perform(get("/api/users/me"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    void actualizarUserShouldUpdateAuthenticatedUser() throws Exception {
+        String registerResponse = registerUser("integration-update@test.com", "Password123");
+        String token = objectMapper.readTree(registerResponse).get("accessToken").asText();
+
+        UpdateUserRequest request = new UpdateUserRequest();
+        request.setEmail("integration-update-new@test.com");
+        request.setPassword("Password456");
+
+        mockMvc.perform(put("/api/users/me/actualizarUser")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("integration-update-new@test.com"))
+                .andExpect(jsonPath("$.role").value("USER"));
+
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("integration-update-new@test.com");
+        loginRequest.setPassword("Password456");
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("integration-update-new@test.com"));
+    }
+
+    @Test
+    void actualizarUserShouldReturnConflictWhenEmailAlreadyExists() throws Exception {
+        registerUser("integration-owner@test.com", "Password123");
+        String secondUserResponse = registerUser("integration-second@test.com", "Password123");
+        String secondUserToken = objectMapper.readTree(secondUserResponse).get("accessToken").asText();
+
+        UpdateUserRequest request = new UpdateUserRequest();
+        request.setEmail("integration-owner@test.com");
+        request.setPassword("Password456");
+
+        mockMvc.perform(put("/api/users/me/actualizarUser")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + secondUserToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.title").value("Conflict"));
+    }
+
+    @Test
+    void actualizarUserShouldRequireAuthentication() throws Exception {
+        UpdateUserRequest request = new UpdateUserRequest();
+        request.setEmail("integration-no-auth@test.com");
+        request.setPassword("Password456");
+
+        mockMvc.perform(put("/api/users/me/actualizarUser")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is4xxClientError());
     }
 

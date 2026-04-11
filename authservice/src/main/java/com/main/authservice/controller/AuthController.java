@@ -1,6 +1,7 @@
 package com.main.authservice.controller;
 
 import com.main.authservice.dto.AuthResponse;
+import com.main.authservice.dto.BootstrapAdminRequest;
 import com.main.authservice.dto.LoginRequest;
 import com.main.authservice.dto.RefreshRequest;
 import com.main.authservice.dto.RegisterRequest;
@@ -49,6 +50,18 @@ public class AuthController {
         logger.info("Register requested");
         AuthResponse response = authService.register(request);
         logger.info("Register completed for userId={}", response.getUserId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /**
+     * Bootstrap de primer administrador cuando aun no existe ningun ADMIN.
+     */
+    @PostMapping("/bootstrap-admin")
+    @Operation(summary = "Bootstrap first admin", description = "Creates or promotes first ADMIN user. Allowed only if no ADMIN exists.")
+    public ResponseEntity<AuthResponse> bootstrapAdmin(@Valid @RequestBody BootstrapAdminRequest request) {
+        logger.info("Bootstrap admin requested");
+        AuthResponse response = authService.bootstrapAdmin(request);
+        logger.info("Bootstrap admin completed for userId={}", response.getUserId());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

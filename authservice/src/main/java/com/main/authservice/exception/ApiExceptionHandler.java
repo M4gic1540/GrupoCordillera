@@ -79,6 +79,15 @@ public class ApiExceptionHandler {
         return buildProblem(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage());
     }
 
+    /**
+     * Traduce recursos inexistentes a HTTP 404.
+     */
+    @ExceptionHandler(NotFoundException.class)
+    public ProblemDetail handleNotFound(NotFoundException ex) {
+        logger.warn("Not found handled: {}", ex.getMessage());
+        return buildProblem(HttpStatus.NOT_FOUND, "Not Found", ex.getMessage());
+    }
+
     private ProblemDetail buildProblem(HttpStatus status, String title, String detail) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(status);
         problemDetail.setTitle(title);

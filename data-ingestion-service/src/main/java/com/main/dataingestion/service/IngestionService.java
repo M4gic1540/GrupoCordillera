@@ -9,7 +9,9 @@ import com.main.dataingestion.repository.IngestionEventRepository;
 import com.main.dataingestion.repository.SyncRunRepository;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -41,9 +43,26 @@ public class IngestionService {
         SourceConnector connector = connectorFactory.getConnector(sourceSystem);
 
         List<JsonNode> rawBatch = connector.fetchBatch();
+        if (rawBatch == null) {
+            rawBatch = List.of();
+        }
         List<IngestionEvent> events = new ArrayList<>();
+        Set<String> dedupKeys = new HashSet<>();
+        int rejectedCount = 0;
 
         for (JsonNode payload : rawBatch) {
+            if (!isPayloadValid(payload, sourceSystem)) {
+                rejectedCount++;
+                continue;
+            }
+
+            String dedupKey = payload.toString();
+            if (!dedupKeys.add(dedupKey)) {
+                logger.warn("Rejected duplicated payload for source={}", sourceSystem);
+                rejectedCount++;
+                continue;
+            }
+
             IngestionEvent event = new IngestionEvent();
             event.setSourceSystem(sourceSystem);
             event.setIngestedAt(OffsetDateTime.now());
@@ -62,11 +81,33 @@ public class IngestionService {
         syncRunRepository.save(run);
 
         kpiNotificationService.notifyRecalculation(sourceSystem, events.size());
-        logger.info("Ingestion completed for source={}, records={}", sourceSystem, events.size());
+        logger.info("Ingestion completed for source={}, records={}, rejected={}", sourceSystem, events.size(), rejectedCount);
 
         return new SyncResult(sourceSystem, events.size(), run.getCompletedAt());
     }
 
     public record SyncResult(String sourceSystem, int processedRecords, OffsetDateTime completedAt) {
+    }
+
+    private boolean isPayloadValid(JsonNode payload, String sourceSystem) {
+        if (payload == null || !payload.isObject()) {
+            logger.warn("Rejected payload for source={} due to invalid structure", sourceSystem);
+            return false;
+        }
+
+        JsonNode sourceNode = payload.get("source");
+        if (sourceNode != null && sourceNode.isTextual() && !sourceSystem.equalsIgnoreCase(sourceNode.asText())) {
+            logger.warn("Rejected payload for source={} due to source mismatch", sourceSystem);
+            return false;
+        }
+
+        JsonNode typeNode = payload.get("type");
+        // When source metadata is declared, event type becomes mandatory for consistency.
+        if (sourceNode != null && (typeNode == null || !typeNode.isTextual() || typeNode.asText().isBlank())) {
+            logger.warn("Rejected payload for source={} due to missing/invalid type", sourceSystem);
+            return false;
+        }
+
+        return true;
     }
 }
