@@ -7,7 +7,7 @@ spring:
   datasource:
     url: ${EVENTS_DB_URL:jdbc:postgresql://postgres-events:5432/events_db}
     username: ${EVENTS_DB_USERNAME:postgres}
-    password: ${EVENTS_DB_PASSWORD:postgres}
+    password: ${EVENTS_DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update

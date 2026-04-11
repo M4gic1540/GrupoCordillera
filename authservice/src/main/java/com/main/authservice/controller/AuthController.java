@@ -15,6 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import io.jsonwebtoken.JwtException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,10 +40,19 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
+    private final String bootstrapAdminToken;
 
-    public AuthController(AuthService authService, JwtService jwtService) {
+    public AuthController(
+            AuthService authService,
+            JwtService jwtService,
+            UserDetailsService userDetailsService,
+            @Value("${app.bootstrap.admin-token:}") String bootstrapAdminToken
+    ) {
         this.authService = authService;
         this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+        this.bootstrapAdminToken = bootstrapAdminToken;
     }
 
     /**
@@ -58,7 +72,20 @@ public class AuthController {
      */
     @PostMapping("/bootstrap-admin")
     @Operation(summary = "Bootstrap first admin", description = "Creates or promotes first ADMIN user. Allowed only if no ADMIN exists.")
-    public ResponseEntity<AuthResponse> bootstrapAdmin(@Valid @RequestBody BootstrapAdminRequest request) {
+    public ResponseEntity<AuthResponse> bootstrapAdmin(
+            @Valid @RequestBody BootstrapAdminRequest request,
+            @RequestHeader(value = "X-Bootstrap-Token", required = false) String providedBootstrapToken
+    ) {
+        if (!StringUtils.hasText(bootstrapAdminToken)) {
+            logger.warn("Bootstrap admin blocked: missing installation token configuration");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        if (!StringUtils.hasText(providedBootstrapToken) || !bootstrapAdminToken.equals(providedBootstrapToken)) {
+            logger.warn("Bootstrap admin blocked: invalid installation token");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         logger.info("Bootstrap admin requested");
         AuthResponse response = authService.bootstrapAdmin(request);
         logger.info("Bootstrap admin completed for userId={}", response.getUserId());
@@ -104,10 +131,16 @@ public class AuthController {
 
         String token = authorization.substring(7);
         try {
-            if (jwtService.isTokenValid(token)) {
+            String subject = jwtService.extractSubject(token);
+            if (!StringUtils.hasText(subject)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(subject);
+            if (jwtService.isTokenValid(token, userDetails)) {
                 return ResponseEntity.ok().build();
             }
-        } catch (Exception ex) {
+        } catch (JwtException | IllegalArgumentException | UsernameNotFoundException ex) {
             logger.debug("JWT validation rejected: invalid token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

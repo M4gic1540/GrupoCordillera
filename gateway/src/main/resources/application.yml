@@ -36,8 +36,13 @@ spring:
               - DELETE
               - OPTIONS
             allowedHeaders:
-              - "*"
-            allowCredentials: true
+              - Authorization
+              - Content-Type
+              - Accept
+              - Origin
+              - X-Requested-With
+              - X-Correlation-ID
+            allowCredentials: false
       default-filters:
         - PreserveHostHeader
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST

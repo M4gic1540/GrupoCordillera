@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_DB: ${EVENTS_DB_NAME:-events_db}
       POSTGRES_USER: ${EVENTS_DB_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${EVENTS_DB_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${EVENTS_DB_PASSWORD}
     expose:
       - "5432"
     volumes:
@@ -17,6 +17,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    mem_limit: 200m
+    cpus: 0.15
 
   postgres-kpi:
     image: postgres:15
@@ -26,7 +28,7 @@ services:
     environment:
       POSTGRES_DB: ${KPI_DB_NAME:-kpi_db}
       POSTGRES_USER: ${KPI_DB_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${KPI_DB_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${KPI_DB_PASSWORD}
     expose:
       - "5432"
     volumes:
@@ -36,6 +38,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    mem_limit: 200m
+    cpus: 0.15
 
   postgres:
     image: postgres:15
@@ -45,7 +49,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-authservice_db}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     expose:
       - "5432"
     volumes:
@@ -55,6 +59,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    mem_limit: 200m
+    cpus: 0.15
 
   authservice-1:
     build:
@@ -69,11 +75,15 @@ services:
       SPRING_PROFILES_ACTIVE: postgres
       DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-authservice_db}
       DB_USERNAME: ${POSTGRES_USER:-postgres}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      BOOTSTRAP_ADMIN_TOKEN: ${BOOTSTRAP_ADMIN_TOKEN}
     expose:
       - "8080"
     volumes:
       - ./Logs:/app/Logs
+    mem_limit: 300m
+    cpus: 0.25
 
   authservice-2:
     build:
@@ -88,11 +98,15 @@ services:
       SPRING_PROFILES_ACTIVE: postgres
       DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-authservice_db}
       DB_USERNAME: ${POSTGRES_USER:-postgres}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      BOOTSTRAP_ADMIN_TOKEN: ${BOOTSTRAP_ADMIN_TOKEN}
     expose:
       - "8080"
     volumes:
       - ./Logs:/app/Logs
+    mem_limit: 300m
+    cpus: 0.25
 
   data-ingestion-service-1:
     build:
@@ -108,10 +122,12 @@ services:
     environment:
       EVENTS_DB_URL: jdbc:postgresql://postgres-events:5432/${EVENTS_DB_NAME:-events_db}
       EVENTS_DB_USERNAME: ${EVENTS_DB_USERNAME:-postgres}
-      EVENTS_DB_PASSWORD: ${EVENTS_DB_PASSWORD:-postgres}
+      EVENTS_DB_PASSWORD: ${EVENTS_DB_PASSWORD}
       KPI_ENGINE_BASE_URL: ${KPI_ENGINE_BASE_URL:-http://kpi-engine:8082}
     expose:
       - "8081"
+    mem_limit: 200m
+    cpus: 0.15
 
   data-ingestion-service-2:
     build:
@@ -127,10 +143,12 @@ services:
     environment:
       EVENTS_DB_URL: jdbc:postgresql://postgres-events:5432/${EVENTS_DB_NAME:-events_db}
       EVENTS_DB_USERNAME: ${EVENTS_DB_USERNAME:-postgres}
-      EVENTS_DB_PASSWORD: ${EVENTS_DB_PASSWORD:-postgres}
+      EVENTS_DB_PASSWORD: ${EVENTS_DB_PASSWORD}
       KPI_ENGINE_BASE_URL: ${KPI_ENGINE_BASE_URL:-http://kpi-engine:8082}
     expose:
       - "8081"
+    mem_limit: 200m
+    cpus: 0.15
 
   kpi-engine:
     build:
@@ -144,9 +162,11 @@ services:
     environment:
       KPI_DB_URL: jdbc:postgresql://postgres-kpi:5432/${KPI_DB_NAME:-kpi_db}
       KPI_DB_USERNAME: ${KPI_DB_USERNAME:-postgres}
-      KPI_DB_PASSWORD: ${KPI_DB_PASSWORD:-postgres}
+      KPI_DB_PASSWORD: ${KPI_DB_PASSWORD}
     expose:
       - "8082"
+    mem_limit: 200m
+    cpus: 0.15
 
   gateway:
     build:
@@ -171,6 +191,8 @@ services:
       FRONTEND_ORIGIN: http://localhost:5173
     ports:
       - "8080:8080"
+    mem_limit: 200m
+    cpus: 0.15
 
 volumes:
   postgres_data:

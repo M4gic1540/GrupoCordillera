@@ -12,6 +12,13 @@ pipeline {
 
     environment {
         MAVEN_OPTS = '-Dmaven.test.failure.ignore=false'
+        SPRING_PROFILES_ACTIVE = 'local'
+        JWT_SECRET = 'uk0gORcK9s44BEM5QcB8x5lNLWgaTVsBfc2A1FchfYI='
+        BOOTSTRAP_ADMIN_TOKEN = '6Z5AYKwd2Q+0YcdHpjr+vtF2gzsEcXDgzziQYq1LiqI='
+    // Solo si usas perfil postgres:
+    // DB_URL = 'jdbc:postgresql://localhost:5432/auth_db'
+    // DB_USERNAME = 'postgres'
+    // DB_PASSWORD = 'tu_password_postgres'
     }
 
     stages {
@@ -31,8 +38,8 @@ pipeline {
         }
 
                 stage('Authservice Test Minimum Per Class') {
-                        steps {
-                                sh '''#!/bin/bash
+            steps {
+                sh '''#!/bin/bash
 set -euo pipefail
 
 auth_service_report="authservice/target/surefire-reports/TEST-com.main.authservice.service.AuthServiceTest.xml"
@@ -71,7 +78,7 @@ fi
 
 echo "Quality gate OK: cada clase objetivo tiene al menos 20 tests"
 '''
-                        }
+            }
                 }
 
         stage('Build & Test data-ingestion-service') {

@@ -31,15 +31,17 @@ class AuthControllerTest {
 
     private final AuthService authService = org.mockito.Mockito.mock(AuthService.class);
     private final JwtService jwtService = org.mockito.Mockito.mock(JwtService.class);
+    private final org.springframework.security.core.userdetails.UserDetailsService userDetailsService = org.mockito.Mockito.mock(org.springframework.security.core.userdetails.UserDetailsService.class);
+    private final String bootstrapAdminToken = "dummy-token";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
 
     private MockMvc mockMvc() {
         validator.afterPropertiesSet();
-        return MockMvcBuilders.standaloneSetup(new AuthController(authService, jwtService))
-                .setControllerAdvice(new ApiExceptionHandler())
-                .setValidator(validator)
-                .build();
+        return MockMvcBuilders.standaloneSetup(new AuthController(authService, jwtService, userDetailsService, bootstrapAdminToken))
+            .setControllerAdvice(new ApiExceptionHandler())
+            .setValidator(validator)
+            .build();
     }
 
     @Test
@@ -153,10 +155,15 @@ class AuthControllerTest {
 
     @Test
     void validateShouldReturnOkWhenTokenIsValid() throws Exception {
-        when(jwtService.isTokenValid(eq("valid-token"))).thenReturn(true);
+        String token = "valid-token";
+        String username = "user@test.com";
+        org.springframework.security.core.userdetails.UserDetails userDetails = org.mockito.Mockito.mock(org.springframework.security.core.userdetails.UserDetails.class);
+        when(jwtService.extractSubject(eq(token))).thenReturn(username);
+        when(userDetailsService.loadUserByUsername(eq(username))).thenReturn(userDetails);
+        when(jwtService.isTokenValid(eq(token), eq(userDetails))).thenReturn(true);
 
         mockMvc().perform(get("/api/auth/validate")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer valid-token"))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isOk());
     }
 
