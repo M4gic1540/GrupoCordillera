@@ -7,7 +7,7 @@ spring:
   datasource:
     url: ${KPI_DB_URL:jdbc:postgresql://postgres-kpi:5432/kpi_db}
     username: ${KPI_DB_USERNAME:postgres}
-    password: ${KPI_DB_PASSWORD:postgres}
+    password: ${KPI_DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
