@@ -1,22 +1,20 @@
-FROM eclipse-temurin:25-jdk AS builder
+FROM maven:3.9.9-eclipse-temurin-17 AS builder
 WORKDIR /app
 
 COPY pom.xml ./
-COPY .mvn ./.mvn
-COPY mvnw ./
-RUN chmod +x mvnw
-
-# Resolve dependencies first to improve Docker layer caching.
-RUN ./mvnw -q -DskipTests dependency:go-offline
+RUN mvn -q -DskipTests dependency:go-offline
 
 COPY src ./src
 
-RUN ./mvnw -DskipTests clean package
+RUN mvn -q -DskipTests clean package
 
-FROM eclipse-temurin:25-jre
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 
 COPY --from=builder /app/target/*.jar app.jar
+
+RUN addgroup --system app && adduser --system --ingroup app app
+USER app
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

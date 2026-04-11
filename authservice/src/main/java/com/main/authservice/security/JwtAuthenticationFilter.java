@@ -16,6 +16,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Filtro que autentica requests con header Bearer JWT y carga el SecurityContext.
+ */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -27,6 +30,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
+    /**
+     * Intenta autenticar la request usando JWT; si falla, deja continuar sin autenticacion.
+     */
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,

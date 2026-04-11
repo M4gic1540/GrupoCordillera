@@ -2,6 +2,8 @@ services:
   postgres-events:
     image: postgres:15
     container_name: dataingestion-postgres
+    restart: unless-stopped
+    init: true
     environment:
       POSTGRES_DB: ${EVENTS_DB_NAME:-events_db}
       POSTGRES_USER: ${EVENTS_DB_USERNAME:-postgres}
@@ -19,6 +21,8 @@ services:
   postgres-kpi:
     image: postgres:15
     container_name: kpiengine-postgres
+    restart: unless-stopped
+    init: true
     environment:
       POSTGRES_DB: ${KPI_DB_NAME:-kpi_db}
       POSTGRES_USER: ${KPI_DB_USERNAME:-postgres}
@@ -36,12 +40,14 @@ services:
   postgres:
     image: postgres:15
     container_name: authservice-postgres
+    restart: unless-stopped
+    init: true
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-authservice_db}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -54,6 +60,8 @@ services:
     build:
       context: ./authservice
       dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
     depends_on:
       postgres:
         condition: service_healthy
@@ -71,6 +79,8 @@ services:
     build:
       context: ./authservice
       dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
     depends_on:
       postgres:
         condition: service_healthy
@@ -88,6 +98,8 @@ services:
     build:
       context: ./data-ingestion-service
       dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
     depends_on:
       postgres-events:
         condition: service_healthy
@@ -98,13 +110,15 @@ services:
       EVENTS_DB_USERNAME: ${EVENTS_DB_USERNAME:-postgres}
       EVENTS_DB_PASSWORD: ${EVENTS_DB_PASSWORD:-postgres}
       KPI_ENGINE_BASE_URL: ${KPI_ENGINE_BASE_URL:-http://kpi-engine:8082}
-    ports:
-      - "8081:8081"
+    expose:
+      - "8081"
 
   data-ingestion-service-2:
     build:
       context: ./data-ingestion-service
       dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
     depends_on:
       postgres-events:
         condition: service_healthy
@@ -122,6 +136,8 @@ services:
     build:
       context: ./kpi-engine
       dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
     depends_on:
       postgres-kpi:
         condition: service_healthy
@@ -129,22 +145,30 @@ services:
       KPI_DB_URL: jdbc:postgresql://postgres-kpi:5432/${KPI_DB_NAME:-kpi_db}
       KPI_DB_USERNAME: ${KPI_DB_USERNAME:-postgres}
       KPI_DB_PASSWORD: ${KPI_DB_PASSWORD:-postgres}
-    ports:
-      - "8082:8082"
     expose:
       - "8082"
 
-  api-gateway:
-    image: nginx:1.27-alpine
-    container_name: authservice-api-gateway
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: authservice-spring-gateway
+    restart: unless-stopped
+    init: true
     depends_on:
       - authservice-1
       - authservice-2
       - data-ingestion-service-1
       - data-ingestion-service-2
       - kpi-engine
-    volumes:
-      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    environment:
+      AUTHSERVICE_1_URL: http://authservice-1:8080
+      AUTHSERVICE_2_URL: http://authservice-2:8080
+      INGESTION_1_URL: http://data-ingestion-service-1:8081
+      INGESTION_2_URL: http://data-ingestion-service-2:8081
+      KPI_ENGINE_URL: http://kpi-engine:8082
+      AUTH_VALIDATION_URL: http://authservice-1:8080/api/auth/validate
+      FRONTEND_ORIGIN: http://localhost:5173
     ports:
       - "8080:8080"
 

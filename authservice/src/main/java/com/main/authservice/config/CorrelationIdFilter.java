@@ -11,12 +11,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+/**
+ * Filtro que asegura presencia de correlation id por request y lo registra en MDC.
+ */
 @Component
 public class CorrelationIdFilter extends OncePerRequestFilter {
 
     public static final String HEADER_NAME = "X-Correlation-ID";
     private static final String MDC_KEY = "correlationId";
 
+    /**
+     * Resuelve/genera correlation id, lo propaga en MDC y lo limpia al finalizar la request.
+     */
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,

@@ -14,11 +14,17 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * Manejo global de excepciones de API con formato ProblemDetail.
+ */
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
+    /**
+     * Traduce errores de validacion de DTO a una respuesta 400 estructurada.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         logger.warn("Validation error in request body: {} field errors", ex.getBindingResult().getFieldErrorCount());
@@ -40,6 +46,9 @@ public class ApiExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * Traduce violaciones de constraints en parametros/path/query a respuesta 400.
+     */
     @ExceptionHandler(ConstraintViolationException.class)
     public ProblemDetail handleConstraintViolation(ConstraintViolationException ex) {
         logger.warn("Constraint violation: {} violations", ex.getConstraintViolations().size());
@@ -52,16 +61,31 @@ public class ApiExceptionHandler {
         return problemDetail;
     }
 
+    /**
+     * Traduce conflictos de negocio a HTTP 409.
+     */
     @ExceptionHandler(ConflictException.class)
     public ProblemDetail handleConflict(ConflictException ex) {
         logger.warn("Conflict handled: {}", ex.getMessage());
         return buildProblem(HttpStatus.CONFLICT, "Conflict", ex.getMessage());
     }
 
+    /**
+     * Traduce errores de autenticacion/autorizacion a HTTP 401.
+     */
     @ExceptionHandler(UnauthorizedException.class)
     public ProblemDetail handleUnauthorized(UnauthorizedException ex) {
         logger.warn("Unauthorized handled: {}", ex.getMessage());
         return buildProblem(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage());
+    }
+
+    /**
+     * Traduce recursos inexistentes a HTTP 404.
+     */
+    @ExceptionHandler(NotFoundException.class)
+    public ProblemDetail handleNotFound(NotFoundException ex) {
+        logger.warn("Not found handled: {}", ex.getMessage());
+        return buildProblem(HttpStatus.NOT_FOUND, "Not Found", ex.getMessage());
     }
 
     private ProblemDetail buildProblem(HttpStatus status, String title, String detail) {
