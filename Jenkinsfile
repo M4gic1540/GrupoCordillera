@@ -2,7 +2,9 @@ pipeline {
 
     stages {
             steps {
-                sh '''#!/bin/bash
+                checkout scm
+            }
+        }
 
 auth_service_report="authservice/target/surefire-reports/TEST-com.main.authservice.service.AuthServiceTest.xml"
 
