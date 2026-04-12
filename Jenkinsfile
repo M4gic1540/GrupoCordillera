@@ -1,25 +1,10 @@
 pipeline {
-    agent any
 
-    options {
-        timestamps()
-        disableConcurrentBuilds()
-    }
+    stages {
+            steps {
+                sh '''#!/bin/bash
 
-    parameters {
-        booleanParam(name: 'DEPLOY_STACK', defaultValue: false, description: 'Levantar stack con Docker Compose al final del pipeline')
-    }
-
-    environment {
-        MAVEN_OPTS = '-Dmaven.test.failure.ignore=false'
-        SPRING_PROFILES_ACTIVE = 'local'
-        JWT_SECRET = 'uk0gORcK9s44BEM5QcB8x5lNLWgaTVsBfc2A1FchfYI='
-        BOOTSTRAP_ADMIN_TOKEN = '6Z5AYKwd2Q+0YcdHpjr+vtF2gzsEcXDgzziQYq1LiqI='
-    // Solo si usas perfil postgres:
-    // DB_URL = 'jdbc:postgresql://localhost:5432/auth_db'
-    // DB_USERNAME = 'postgres'
-    // DB_PASSWORD = 'tu_password_postgres'
-    }
+auth_service_report="authservice/target/surefire-reports/TEST-com.main.authservice.service.AuthServiceTest.xml"
 
     stages {
         stage('Checkout') {
@@ -28,22 +13,25 @@ pipeline {
             }
         }
 
-        stage('Build & Test authservice') {
-            steps {
-                dir('authservice') {
-                    sh 'chmod +x mvnw'
-                    sh './mvnw -B clean test'
-                }
-            }
-        }
-
-                stage('Authservice Test Minimum Per Class') {
-            steps {
-                sh '''#!/bin/bash
+        stage('Build & Test All') {
+            parallel {
+                stage('authservice') {
+                    stages {
+                        stage('Build & Test') {
+                            steps {
+                                dir('authservice') {
+                                    sh 'chmod +x mvnw'
+                                    sh './mvnw -B clean test'
+                                }
+                            }
+                        }
+                        stage('Test Minimum Per Class') {
+                            steps {
+                                sh '''#!/bin/bash
 set -euo pipefail
 
-auth_service_report="authservice/target/surefire-reports/TEST-com.main.authservice.service.AuthServiceTest.xml"
-auth_controller_report="authservice/target/surefire-reports/TEST-com.main.authservice.controller.AuthControllerTest.xml"
+
+        stage('Build Docker Images') {
 
 if [[ ! -f "$auth_service_report" ]]; then
     echo "No se encontro el reporte: $auth_service_report"
@@ -60,11 +48,11 @@ extract_tests() {
     grep -o 'tests="[0-9]*"' "$file" | head -1 | sed 's/[^0-9]//g'
 }
 
-auth_service_count=$(extract_tests "$auth_service_report")
-auth_controller_count=$(extract_tests "$auth_controller_report")
+            steps {
+                script {
 
-echo "AuthServiceTest tests: $auth_service_count"
-echo "AuthControllerTest tests: $auth_controller_count"
+                    docker.withRegistry('', 'dockerhub-credentials-id') {
+                        docker.build('grupocordillera/authservice:latest', './authservice').push()
 
 if [[ "$auth_service_count" -lt 20 ]]; then
     echo "Fallo de quality gate: AuthServiceTest tiene menos de 20 tests"
@@ -76,34 +64,35 @@ if [[ "$auth_controller_count" -lt 20 ]]; then
     exit 1
 fi
 
-echo "Quality gate OK: cada clase objetivo tiene al menos 20 tests"
+                        docker.build('grupocordillera/data-ingestion-service:latest', './data-ingestion-service').push()
 '''
-            }
+                            }
+                        }
+                    }
                 }
-
-        stage('Build & Test data-ingestion-service') {
-            steps {
-                dir('data-ingestion-service') {
-                    sh 'chmod +x mvnw'
-                    sh './mvnw -B clean test'
+                stage('data-ingestion-service') {
+                    steps {
+                        dir('data-ingestion-service') {
+                            sh 'chmod +x mvnw'
+                            sh './mvnw -B clean test'
+                        }
+                    }
                 }
-            }
-        }
-
-        stage('Gateway Test Suite') {
-            steps {
-                dir('gateway') {
-                    sh 'chmod +x mvnw'
-                    sh './mvnw -B clean test'
+                stage('gateway') {
+                    steps {
+                        dir('gateway') {
+                            sh 'chmod +x mvnw'
+                            sh './mvnw -B clean test'
+                        }
+                    }
                 }
-            }
-        }
-
-        stage('Build & Test kpi-engine') {
-            steps {
-                dir('kpi-engine') {
-                    sh 'chmod +x mvnw'
-                    sh './mvnw -B clean test'
+                stage('kpi-engine') {
+                    steps {
+                        dir('kpi-engine') {
+                            sh 'chmod +x mvnw'
+                            sh './mvnw -B clean test'
+                        }
+                    }
                 }
             }
         }
@@ -119,9 +108,28 @@ echo "Quality gate OK: cada clase objetivo tiene al menos 20 tests"
 
         stage('Build Docker Images') {
             steps {
-                sh 'docker build -t grupocordillera/authservice:latest ./authservice'
-                sh 'docker build -t grupocordillera/data-ingestion-service:latest ./data-ingestion-service'
-                sh 'docker build -t grupocordillera/kpi-engine:latest ./kpi-engine'
+                script {
+                    docker.withRegistry('', 'dockerhub-credentials-id') {
+                        docker.build('grupocordillera/authservice:latest', './authservice').push()
+                        docker.build('grupocordillera/data-ingestion-service:latest', './data-ingestion-service').push()
+                        docker.build('grupocordillera/kpi-engine:latest', './kpi-engine').push()
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Stack') {
+            when {
+                expression { return false }
+            }
+            steps {
+                echo 'Deploy Stack disabled - nginx.conf mount issues. Configure docker-compose paths manually.'
+            }
+        }
+    }
+                        docker.build('grupocordillera/kpi-engine:latest', './kpi-engine').push()
+                    }
+                }
             }
         }
 
@@ -142,9 +150,12 @@ echo "Quality gate OK: cada clase objetivo tiene al menos 20 tests"
         }
         success {
             echo 'Pipeline completado correctamente.'
+            // Notificación de ejemplo por Slack (requiere configuración de plugin y credencial)
+            slackSend (channel: '#devops', color: 'good', message: "Build exitoso: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
         }
         failure {
             echo 'Pipeline fallo. Revisar logs y reportes de pruebas.'
+            slackSend (channel: '#devops', color: 'danger', message: "Build fallido: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
         }
     }
 }
