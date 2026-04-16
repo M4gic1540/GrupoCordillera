@@ -1,6 +1,7 @@
 package com.main.dataingestion.service;
 
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,11 @@ public class KpiNotificationService {
         this.recalcPath = recalcPath;
     }
 
+    /**
+     * Notifica al motor KPI que hubo nuevos datos para recalcular indicadores.
+     *
+     * <p>Si la llamada falla, se registra warning y el flujo principal no se detiene.</p>
+     */
     public void notifyRecalculation(String sourceSystem, int affectedRecords) {
         try {
             webClient.post()

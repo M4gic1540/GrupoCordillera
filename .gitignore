@@ -1,4 +1,14 @@
 arquitectura-proyecto.mmd
+kpi-engine-architecture.mmd
+kpi-engine-recalculate-sequence.mmd
+gateway-flujo.mmd
 llavesMiservidor.pem
 .env
 INFORME_VULNERABILIDADES.tex
+target/
+.idea
+INFORME_VULNERABILIDADES.tex
+INFORME_KPI_ENGINE.tex
+INFORME_GATEWAY.tex
+.github
+Logs
