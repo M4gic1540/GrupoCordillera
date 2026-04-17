@@ -12,9 +12,21 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * Manejador global de errores para la API de KPI Engine.
+ *
+ * <p>Traduce excepciones comunes a respuestas HTTP estructuradas y estables
+ * para clientes consumidores.</p>
+ */
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
+    /**
+     * Maneja errores de validación de bean validation en payloads.
+     *
+     * @param ex excepción con detalle de campos inválidos.
+     * @return respuesta 400 con lista de errores por campo.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
@@ -34,6 +46,12 @@ public class ApiExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
+    /**
+     * Maneja body ausente o JSON mal formado.
+     *
+     * @param ex excepción de deserialización/parsing.
+     * @return respuesta 400 con mensaje estándar de formato inválido.
+     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> handleMalformedJson(HttpMessageNotReadableException ex) {
         Map<String, Object> body = new HashMap<>();
@@ -44,6 +62,12 @@ public class ApiExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
+    /**
+     * Fallback genérico para errores no controlados explícitamente.
+     *
+     * @param ex excepción inesperada.
+     * @return respuesta 500 con mensaje genérico.
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
         Map<String, Object> body = new HashMap<>();

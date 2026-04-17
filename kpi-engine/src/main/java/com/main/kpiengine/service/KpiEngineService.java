@@ -14,6 +14,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+/**
+ * Servicio de negocio para cálculo y consulta de indicadores (KPI).
+ *
+ * <p>Orquesta repositorios de definición/snapshot para:
+ * 1) asegurar catálogo mínimo de KPIs,
+ * 2) calcular snapshots por evento de ingestión,
+ * 3) exponer resultados listos para API.</p>
+ */
 public class KpiEngineService {
 
     private final KpiDefinitionRepository definitionRepository;
@@ -25,6 +33,12 @@ public class KpiEngineService {
         this.snapshotRepository = snapshotRepository;
     }
 
+    /**
+     * Recalcula snapshots de KPI a partir del origen afectado y cantidad de registros.
+     *
+     * @param request payload con sistema origen y volumen impactado.
+     * @return respuesta con snapshots recalculados para throughput y calidad.
+     */
     @Transactional
     public RecalculateKpiResponse recalculate(RecalculateKpiRequest request) {
         int affectedRecords = request.getAffectedRecords();
@@ -45,6 +59,11 @@ public class KpiEngineService {
         );
     }
 
+    /**
+     * Consulta los snapshots más recientes para visualización en dashboard/API.
+     *
+     * @return hasta 20 snapshots ordenados del más reciente al más antiguo.
+     */
     @Transactional(readOnly = true)
     public List<KpiSnapshotResponse> getLatestSnapshots() {
         return snapshotRepository.findTop20ByOrderByComputedAtDesc().stream()
@@ -52,6 +71,14 @@ public class KpiEngineService {
                 .toList();
     }
 
+    /**
+     * Garantiza existencia de una definición KPI; si no existe, la crea.
+     *
+     * @param code identificador único funcional del KPI.
+     * @param name nombre legible para API/dashboard.
+     * @param frequency frecuencia semántica de actualización.
+     * @return definición existente o recién persistida.
+     */
     private KpiDefinition ensureDefinition(String code, String name, String frequency) {
         return definitionRepository.findByCode(code)
                 .orElseGet(() -> {
@@ -63,6 +90,15 @@ public class KpiEngineService {
                 });
     }
 
+    /**
+     * Construye una entidad snapshot con metadatos de recálculo.
+     *
+     * @param definition definición KPI asociada.
+     * @param request payload origen del recálculo.
+     * @param computedAt instante de cálculo.
+     * @param value valor numérico calculado del indicador.
+     * @return snapshot listo para persistencia.
+     */
     private KpiSnapshot buildSnapshot(KpiDefinition definition,
                                       RecalculateKpiRequest request,
                                       OffsetDateTime computedAt,
@@ -76,6 +112,15 @@ public class KpiEngineService {
         return snapshot;
     }
 
+    /**
+     * Calcula un índice de calidad simplificado a partir de volumen procesado.
+     *
+     * <p>La función limita máximos para evitar valores desproporcionados y
+     * normaliza con escala fija para consistencia en reportes.</p>
+     *
+     * @param affectedRecords cantidad de registros que detonaron recálculo.
+     * @return índice de calidad redondeado a 2 decimales.
+     */
     private BigDecimal computeQualityIndex(int affectedRecords) {
         if (affectedRecords <= 0) {
             return BigDecimal.ZERO;
@@ -84,6 +129,12 @@ public class KpiEngineService {
         return capped.multiply(BigDecimal.valueOf(0.1)).setScale(2, java.math.RoundingMode.HALF_UP);
     }
 
+    /**
+     * Convierte entidad de dominio a DTO de salida.
+     *
+     * @param snapshot entidad persistida de KPI.
+     * @return DTO serializable para respuesta API.
+     */
     private KpiSnapshotResponse toResponse(KpiSnapshot snapshot) {
         return new KpiSnapshotResponse(
                 snapshot.getDefinition().getCode(),

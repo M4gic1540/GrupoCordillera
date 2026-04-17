@@ -28,6 +28,11 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         this.gatewayWebClient = gatewayWebClient;
     }
 
+    /**
+     * Intercepta requests del gateway y exige token para rutas protegidas.
+     *
+     * <p>La validación real se delega a authservice vía endpoint /validate.</p>
+     */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         if (HttpMethod.OPTIONS.equals(exchange.getRequest().getMethod())) {
@@ -62,6 +67,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
                 });
     }
 
+    /**
+     * Decide si el path requiere autenticación según reglas configuradas.
+     */
     private boolean requiresAuthentication(String requestPath) {
         if (matchesAny(requestPath, properties.getExcludedPaths())) {
             return false;
@@ -69,6 +77,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         return matchesAny(requestPath, properties.getProtectedPaths());
     }
 
+    /**
+     * Evalúa si el path hace match contra alguna regla ant-style.
+     */
     private boolean matchesAny(String path, List<String> patterns) {
         for (String pattern : patterns) {
             if (antPathMatcher.match(pattern, path)) {
@@ -78,6 +89,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         return false;
     }
 
+    /**
+     * Orden alto para ejecutar el filtro temprano en la cadena del gateway.
+     */
     @Override
     public int getOrder() {
         return -100;

@@ -1,45 +1,26 @@
 pipeline {
     agent any
-
-    options {
-        timestamps()
-        disableConcurrentBuilds()
-    }
-
-    parameters {
-        booleanParam(name: 'DEPLOY_STACK', defaultValue: false, description: 'Levantar stack con Docker Compose al final del pipeline')
-    }
-
-    environment {
-        MAVEN_OPTS = '-Dmaven.test.failure.ignore=false'
-        SPRING_PROFILES_ACTIVE = 'local'
-        JWT_SECRET = 'uk0gORcK9s44BEM5QcB8x5lNLWgaTVsBfc2A1FchfYI='
-        BOOTSTRAP_ADMIN_TOKEN = '6Z5AYKwd2Q+0YcdHpjr+vtF2gzsEcXDgzziQYq1LiqI='
-    // Solo si usas perfil postgres:
-    // DB_URL = 'jdbc:postgresql://localhost:5432/auth_db'
-    // DB_USERNAME = 'postgres'
-    // DB_PASSWORD = 'tu_password_postgres'
-    }
-
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-
-        stage('Build & Test authservice') {
-            steps {
-                dir('authservice') {
-                    sh 'chmod +x mvnw'
-                    sh './mvnw -B clean test'
-                }
-            }
-        }
-
-                stage('Authservice Test Minimum Per Class') {
-            steps {
-                sh '''#!/bin/bash
+        stage('Build & Test All') {
+            parallel {
+                stage('authservice') {
+                    stages {
+                        stage('Build & Test') {
+                            steps {
+                                dir('authservice') {
+                                    sh 'chmod +x mvnw'
+                                    sh './mvnw -B clean test'
+                                }
+                            }
+                        }
+                        stage('Test Minimum Per Class') {
+                            steps {
+                                sh '''
 set -euo pipefail
 
 auth_service_report="authservice/target/surefire-reports/TEST-com.main.authservice.service.AuthServiceTest.xml"
@@ -77,37 +58,37 @@ if [[ "$auth_controller_count" -lt 20 ]]; then
 fi
 
 echo "Quality gate OK: cada clase objetivo tiene al menos 20 tests"
-'''
-            }
+                                '''
+                            }
+                        }
+                    }
                 }
-
-        stage('Build & Test data-ingestion-service') {
-            steps {
-                dir('data-ingestion-service') {
-                    sh 'chmod +x mvnw'
-                    sh './mvnw -B clean test'
+                stage('data-ingestion-service') {
+                    steps {
+                        dir('data-ingestion-service') {
+                            sh 'chmod +x mvnw'
+                            sh './mvnw -B clean test'
+                        }
+                    }
+                }
+                stage('gateway') {
+                    steps {
+                        dir('gateway') {
+                            sh 'chmod +x mvnw'
+                            sh './mvnw -B clean test'
+                        }
+                    }
+                }
+                stage('kpi-engine') {
+                    steps {
+                        dir('kpi-engine') {
+                            sh 'chmod +x mvnw'
+                            sh './mvnw -B clean test'
+                        }
+                    }
                 }
             }
         }
-
-        stage('Gateway Test Suite') {
-            steps {
-                dir('gateway') {
-                    sh 'chmod +x mvnw'
-                    sh './mvnw -B clean test'
-                }
-            }
-        }
-
-        stage('Build & Test kpi-engine') {
-            steps {
-                dir('kpi-engine') {
-                    sh 'chmod +x mvnw'
-                    sh './mvnw -B clean test'
-                }
-            }
-        }
-
         stage('SonarQube Analysis') {
             when {
                 expression { return false }
@@ -116,15 +97,17 @@ echo "Quality gate OK: cada clase objetivo tiene al menos 20 tests"
                 echo 'SonarQube analysis disabled. Run manually from authservice: ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar -Dsonar.host.url=http://host.docker.internal:9000 -Dsonar.login=sqp_31d07692fe508884a1822a2b7de6b83c581cebc6'
             }
         }
-
         stage('Build Docker Images') {
             steps {
-                sh 'docker build -t grupocordillera/authservice:latest ./authservice'
-                sh 'docker build -t grupocordillera/data-ingestion-service:latest ./data-ingestion-service'
-                sh 'docker build -t grupocordillera/kpi-engine:latest ./kpi-engine'
+                script {
+                    docker.withRegistry('', 'dockerhub-credentials-id') {
+                        docker.build('grupocordillera/authservice:latest', './authservice').push()
+                        docker.build('grupocordillera/data-ingestion-service:latest', './data-ingestion-service').push()
+                        docker.build('grupocordillera/kpi-engine:latest', './kpi-engine').push()
+                    }
+                }
             }
         }
-
         stage('Deploy Stack') {
             when {
                 expression { return false }
@@ -134,7 +117,6 @@ echo "Quality gate OK: cada clase objetivo tiene al menos 20 tests"
             }
         }
     }
-
     post {
         always {
             archiveArtifacts artifacts: '**/target/*.jar, **/target/surefire-reports/*.xml, gateway/test-results/*.xml', allowEmptyArchive: true
@@ -142,9 +124,12 @@ echo "Quality gate OK: cada clase objetivo tiene al menos 20 tests"
         }
         success {
             echo 'Pipeline completado correctamente.'
+            // Notificación de ejemplo por Slack (requiere configuración de plugin y credencial)
+            slackSend (channel: '#devops', color: 'good', message: "Build exitoso: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
         }
         failure {
             echo 'Pipeline fallo. Revisar logs y reportes de pruebas.'
+            slackSend (channel: '#devops', color: 'danger', message: "Build fallido: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
         }
     }
 }
