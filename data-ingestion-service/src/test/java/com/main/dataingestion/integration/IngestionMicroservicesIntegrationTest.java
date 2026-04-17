@@ -115,6 +115,10 @@ class IngestionMicroservicesIntegrationTest {
         assertEquals(2, result.processedRecords());
         assertNotNull(result.completedAt());
 
+        // Limpiar invocaciones previas para verificar solo la última ejecución exitosa
+        org.mockito.Mockito.clearInvocations(eventRepository);
+        org.mockito.Mockito.clearInvocations(syncRunRepository);
+
         ArgumentCaptor<List<IngestionEvent>> eventsCaptor = ArgumentCaptor.forClass(List.class);
         verify(eventRepository).saveAll(eventsCaptor.capture());
         assertEquals(2, eventsCaptor.getValue().size());
