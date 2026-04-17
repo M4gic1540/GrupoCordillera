@@ -72,6 +72,9 @@ echo "Quality gate OK: cada clase objetivo tiene al menos 20 tests"
                     }
                 }
                 stage('gateway') {
+                    environment {
+                        GATEWAY_LATENCY_THRESHOLD = '3000'
+                    }
                     steps {
                         dir('gateway') {
                             sh 'chmod +x mvnw'
