@@ -77,6 +77,7 @@ echo "Quality gate OK: cada clase objetivo tiene al menos 20 tests"
                     }
                     steps {
                         dir('gateway') {
+                            sh 'echo "GATEWAY_LATENCY_THRESHOLD=$GATEWAY_LATENCY_THRESHOLD"'
                             sh 'chmod +x mvnw'
                             sh './mvnw -B clean test'
                         }
