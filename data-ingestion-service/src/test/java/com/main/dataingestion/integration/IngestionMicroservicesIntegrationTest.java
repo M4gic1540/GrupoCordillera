@@ -102,34 +102,38 @@ class IngestionMicroservicesIntegrationTest {
         IngestionService service = new IngestionService(connectorFactory, eventRepository, syncRunRepository, kpiNotificationService);
 
         IngestionService.SyncResult result = null;
-        // Avoid flaky failures in CI when local HTTP servers are not ready on the first call.
+        // Evitar fallos intermitentes en CI cuando los servidores locales no están listos en el primer intento.
         for (int attempt = 0; attempt < 3; attempt++) {
             result = service.ingest("crm");
             if (result.processedRecords() == 2) {
-                break;
+                // Limpiar invocaciones previas para verificar solo la ejecución exitosa
+                org.mockito.Mockito.clearInvocations(eventRepository);
+                org.mockito.Mockito.clearInvocations(syncRunRepository);
+
+                // Ejecutar nuevamente para capturar solo la interacción correcta
+                result = service.ingest("crm");
+
+                assertEquals("crm", result.sourceSystem());
+                assertEquals(2, result.processedRecords());
+                assertNotNull(result.completedAt());
+
+                ArgumentCaptor<List<IngestionEvent>> eventsCaptor = ArgumentCaptor.forClass(List.class);
+                verify(eventRepository).saveAll(eventsCaptor.capture());
+                assertEquals(2, eventsCaptor.getValue().size());
+                assertEquals("crm", eventsCaptor.getValue().get(0).getSourceSystem());
+
+                verify(syncRunRepository).save(any(SyncRun.class));
+
+                String payload = kpiBody.get();
+                assertNotNull(payload);
+                assertEquals("crm", OBJECT_MAPPER.readTree(payload).get("sourceSystem").asText());
+                assertEquals(2, OBJECT_MAPPER.readTree(payload).get("affectedRecords").asInt());
+                return;
             }
             Thread.sleep(120);
         }
-
-        assertEquals("crm", result.sourceSystem());
-        assertEquals(2, result.processedRecords());
-        assertNotNull(result.completedAt());
-
-        // Limpiar invocaciones previas para verificar solo la última ejecución exitosa
-        org.mockito.Mockito.clearInvocations(eventRepository);
-        org.mockito.Mockito.clearInvocations(syncRunRepository);
-
-        ArgumentCaptor<List<IngestionEvent>> eventsCaptor = ArgumentCaptor.forClass(List.class);
-        verify(eventRepository).saveAll(eventsCaptor.capture());
-        assertEquals(2, eventsCaptor.getValue().size());
-        assertEquals("crm", eventsCaptor.getValue().get(0).getSourceSystem());
-
-        verify(syncRunRepository).save(any(SyncRun.class));
-
-        String payload = kpiBody.get();
-        assertNotNull(payload);
-        assertEquals("crm", OBJECT_MAPPER.readTree(payload).get("sourceSystem").asText());
-        assertEquals(2, OBJECT_MAPPER.readTree(payload).get("affectedRecords").asInt());
+        // Si nunca se obtuvo el resultado esperado, falla el test
+        throw new AssertionError("No se logró procesar 2 registros en ingest después de 3 intentos");
     }
 
     @Test
