@@ -12,3 +12,9 @@ INFORME_KPI_ENGINE.tex
 INFORME_GATEWAY.tex
 .github
 Logs
+diagramas/UMLKPIEngine.mmd
+diagramas/UMLGateway.mmd
+diagramas/UMLDataIngestion.mmd
+diagramas/UMLAuthService.mmd
+diagramas/diagramaSecuencia.mmd
+diagramas/diagramaProcesos.mmd
