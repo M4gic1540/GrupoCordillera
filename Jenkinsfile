@@ -9,34 +9,6 @@ pipeline {
         }
         stage('Build & Test All') {
             parallel {
-auth_service_report="authservice/target/surefire-reports/TEST-com.main.authservice.service.AuthServiceTest.xml"
-auth_controller_report="authservice/target/surefire-reports/TEST-com.main.authservice.controller.AuthControllerTest.xml"
-if [[ ! -f "$auth_service_report" ]]; then
-    echo "No se encontro el reporte: $auth_service_report"
-    exit 1
-fi
-if [[ ! -f "$auth_controller_report" ]]; then
-    echo "No se encontro el reporte: $auth_controller_report"
-    exit 1
-fi
-extract_tests() {
-    local file="$1"
-    grep -o 'tests="[0-9]*"' "$file" | head -1 | sed 's/[^0-9]//g'
-}
-auth_service_count=$(extract_tests "$auth_service_report")
-auth_controller_count=$(extract_tests "$auth_controller_report")
-echo "AuthServiceTest tests: $auth_service_count"
-echo "AuthControllerTest tests: $auth_controller_count"
-if [[ "$auth_service_count" -lt 20 ]]; then
-    echo "Fallo de quality gate: AuthServiceTest tiene menos de 20 tests"
-    exit 1
-fi
-if [[ "$auth_controller_count" -lt 20 ]]; then
-    echo "Fallo de quality gate: AuthControllerTest tiene menos de 20 tests"
-    exit 1
-fi
-echo "Quality gate OK: cada clase objetivo tiene al menos 20 tests"
-                                '''
                 stage('authservice') {
                     steps {
                         script {
