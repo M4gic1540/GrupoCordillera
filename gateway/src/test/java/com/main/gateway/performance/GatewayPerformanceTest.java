@@ -1,13 +1,11 @@
 package com.main.gateway.performance;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.reactive.server.WebTestClient.bindToServer;
-
 import java.time.Duration;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import static org.springframework.test.web.reactive.server.WebTestClient.bindToServer;
 
 import com.main.gateway.testutil.GatewayHttpStubs;
 
@@ -51,13 +50,20 @@ class GatewayPerformanceTest {
     void shouldRespondUnderLatencyThreshold(String path) {
         long start = System.nanoTime();
         client().get()
-                .uri(path)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer perf-token")
-                .exchange()
-                .expectStatus().isOk();
+            .uri(path)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer perf-token")
+            .exchange()
+            .expectStatus().isOk();
 
         long elapsedMillis = (System.nanoTime() - start) / 1_000_000;
-        assertTrue(elapsedMillis < 2000, "Gateway latency exceeded threshold: " + elapsedMillis + "ms");
+        long threshold = 2000;
+        String env = System.getenv("GATEWAY_LATENCY_THRESHOLD");
+        if (env != null) {
+            try {
+            threshold = Long.parseLong(env);
+            } catch (NumberFormatException ignored) {}
+        }
+        assertTrue(elapsedMillis < threshold, "Gateway latency exceeded threshold: " + elapsedMillis + "ms (threshold: " + threshold + "ms)");
     }
 
     static Stream<String> performancePaths() {
