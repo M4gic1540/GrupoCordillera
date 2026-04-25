@@ -141,4 +141,4 @@ def checkTestCount(reportPath, minTests, className) {
         error "Fallo de quality gate: ${className} tiene menos de ${minTests} tests"
     }
 }
-}
+
