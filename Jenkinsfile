@@ -90,7 +90,8 @@ pipeline {
         }
         stage('Deploy Stack') {
             steps {
-                sh 'docker compose up -d --build'
+                sh 'docker compose down --remove-orphans || true'
+                sh 'docker compose up -d --build --force-recreate'
             }
         }
     }
