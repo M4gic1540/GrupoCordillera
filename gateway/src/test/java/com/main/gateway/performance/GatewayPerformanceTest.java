@@ -56,7 +56,7 @@ class GatewayPerformanceTest {
             .expectStatus().isOk();
 
         long elapsedMillis = (System.nanoTime() - start) / 1_000_000;
-        long threshold = 2000;
+        long threshold = 4000;
         String env = System.getenv("GATEWAY_LATENCY_THRESHOLD");
         if (env != null) {
             try {

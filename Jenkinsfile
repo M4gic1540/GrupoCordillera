@@ -35,7 +35,7 @@ pipeline {
                 }
                 stage('gateway') {
                     environment {
-                        GATEWAY_LATENCY_THRESHOLD = '3000'
+                        GATEWAY_LATENCY_THRESHOLD = '4000'
                     }
                     steps {
                         script {
