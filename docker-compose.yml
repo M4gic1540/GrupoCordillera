@@ -166,7 +166,7 @@ services:
     expose:
       - "8082"
     ports:
-      - "8082:8082"
+      - "8083:8082"
       
     mem_limit: 200m
     cpus: 0.15
