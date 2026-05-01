@@ -89,6 +89,13 @@ pipeline {
             }
         }
         stage('Deploy Stack') {
+            environment {
+                POSTGRES_PASSWORD = 'postgres'
+                EVENTS_DB_PASSWORD = 'postgres'
+                KPI_DB_PASSWORD = 'postgres'
+                JWT_SECRET = 'YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE='
+                BOOTSTRAP_ADMIN_TOKEN = 'ci-token'
+            }
             steps {
                 sh 'docker compose down --remove-orphans --volumes || true'
                 sh 'docker rm -f dataingestion-postgres kpiengine-postgres authservice-postgres authservice-spring-gateway || true'
