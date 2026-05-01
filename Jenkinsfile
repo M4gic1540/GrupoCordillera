@@ -82,11 +82,9 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 script {
-                    docker.withRegistry('', 'dockerhub-credentials-id') {
-                        docker.build('grupocordillera/authservice:latest', './authservice').push()
-                        docker.build('grupocordillera/data-ingestion-service:latest', './data-ingestion-service').push()
-                        docker.build('grupocordillera/kpi-engine:latest', './kpi-engine').push()
-                    }
+                    docker.build('grupocordillera/authservice:latest', './authservice')
+                    docker.build('grupocordillera/data-ingestion-service:latest', './data-ingestion-service')
+                    docker.build('grupocordillera/kpi-engine:latest', './kpi-engine')
                 }
             }
         }
