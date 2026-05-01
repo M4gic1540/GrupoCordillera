@@ -89,6 +89,9 @@ pipeline {
             }
         }
         stage('Deploy Stack') {
+            when {
+                expression { return true }
+            }
             environment {
                 POSTGRES_PASSWORD = 'postgres'
                 EVENTS_DB_PASSWORD = 'postgres'
