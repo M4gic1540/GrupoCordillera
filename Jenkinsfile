@@ -96,22 +96,14 @@ pipeline {
     }
     post {
         always {
-            archiveArtifacts artifacts: '**/target/*.jar, **/target/surefire-reports/*.xml, \
-                gateway/test-results/*.xml', allowEmptyArchive: true
+            archiveArtifacts artifacts: '**/target/*.jar, **/target/surefire-reports/*.xml, gateway/test-results/*.xml', allowEmptyArchive: true
             junit testResults: '**/target/surefire-reports/*.xml, gateway/test-results/*.xml', allowEmptyResults: true
         }
         success {
             echo 'Pipeline completado correctamente.'
-            // Notificación de ejemplo por Slack (requiere configuración de plugin y credencial)
-            slackSend(channel: '#devops', color: 'good', message: "Build exitoso: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
         }
         failure {
             echo 'Pipeline fallo. Revisar logs y reportes de pruebas.'
-            slackSend(
-                channel: '#devops',
-                color: 'danger',
-                message: "Build fallido: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
-            )
         }
     }
 }
