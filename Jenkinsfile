@@ -91,7 +91,7 @@ pipeline {
         stage('Deploy Stack') {
             steps {
                 sh 'docker compose down --remove-orphans --volumes || true'
-                sh 'docker rm -f dataingestion-postgres kpiengine-postgres authservice-postgres || true'
+                sh 'docker rm -f dataingestion-postgres kpiengine-postgres authservice-postgres authservice-spring-gateway || true'
                 sh 'docker compose up -d --build --force-recreate'
             }
         }
