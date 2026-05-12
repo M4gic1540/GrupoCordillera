@@ -22,6 +22,21 @@ logging:
   level:
     com.main.dataingestion: INFO
 
+springdoc:
+  swagger-ui:
+    path: /api/ingestion/docs
+  api-docs:
+    path: /api/ingestion/v3/api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
 source-systems:
   systems:
     - key: crm

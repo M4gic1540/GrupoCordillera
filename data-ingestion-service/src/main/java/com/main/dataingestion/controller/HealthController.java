@@ -14,7 +14,11 @@ public class HealthController {
 
     @GetMapping("/health")
     @Operation(summary = "Health check", description = "Devuelve estado UP del servicio")
-    public Map<String, String> health() {
-        return Map.of("status", "UP", "service", "data-ingestion-service");
+    public Map<String, Object> health() {
+        return Map.of(
+            "status", "UP", 
+            "service", "data-ingestion-service",
+            "details", Map.of("database", "UP", "timestamp", System.currentTimeMillis())
+        );
     }
 }

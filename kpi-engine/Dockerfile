@@ -11,6 +11,8 @@ RUN mvn -q -DskipTests clean package
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /app/target/*.jar app.jar
 
 RUN addgroup --system app && adduser --system --ingroup app app

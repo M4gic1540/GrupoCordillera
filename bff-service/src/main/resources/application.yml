@@ -1,0 +1,20 @@
+server:
+  port: 8084
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+bff:
+  auth-base-url: ${AUTHSERVICE_URL:http://authservice-1:8080}
+  ingestion-base-url: ${INGESTION_URL:http://data-ingestion-service:8081}
+  kpi-base-url: ${KPI_ENGINE_URL:http://kpi-engine:8082}
+
+springdoc:
+  swagger-ui:
+    path: /bff/docs
+  api-docs:
+    path: /bff/v3/api-docs
+

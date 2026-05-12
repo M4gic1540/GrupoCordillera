@@ -17,7 +17,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    mem_limit: 200m
+    mem_limit: 400m
     cpus: 0.15
 
   postgres-kpi:
@@ -38,7 +38,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    mem_limit: 200m
+    mem_limit: 400m
     cpus: 0.15
 
   postgres:
@@ -59,7 +59,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    mem_limit: 200m
+    mem_limit: 400m
     cpus: 0.15
 
   authservice-1:
@@ -82,8 +82,14 @@ services:
       - "8080"
     volumes:
       - ./Logs:/app/Logs
-    mem_limit: 300m
-    cpus: 0.25
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/auth/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 180s
+    mem_limit: 600m
+    cpus: 0.5
 
   authservice-2:
     build:
@@ -105,8 +111,14 @@ services:
       - "8080"
     volumes:
       - ./Logs:/app/Logs
-    mem_limit: 300m
-    cpus: 0.25
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/auth/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 180s
+    mem_limit: 600m
+    cpus: 0.5
 
   data-ingestion-service-1:
     build:
@@ -118,16 +130,24 @@ services:
       postgres-events:
         condition: service_healthy
       kpi-engine:
-        condition: service_started
+        condition: service_healthy
     environment:
       EVENTS_DB_URL: jdbc:postgresql://postgres-events:5432/${EVENTS_DB_NAME:-events_db}
       EVENTS_DB_USERNAME: ${EVENTS_DB_USERNAME:-postgres}
       EVENTS_DB_PASSWORD: ${EVENTS_DB_PASSWORD}
       KPI_ENGINE_BASE_URL: ${KPI_ENGINE_BASE_URL:-http://kpi-engine:8082}
+    ports:
+      - "8081:8081"
     expose:
       - "8081"
-    mem_limit: 200m
-    cpus: 0.15
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/api/ingestion/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 180s
+    mem_limit: 600m
+    cpus: 0.5
 
   data-ingestion-service-2:
     build:
@@ -139,7 +159,7 @@ services:
       postgres-events:
         condition: service_healthy
       kpi-engine:
-        condition: service_started
+        condition: service_healthy
     environment:
       EVENTS_DB_URL: jdbc:postgresql://postgres-events:5432/${EVENTS_DB_NAME:-events_db}
       EVENTS_DB_USERNAME: ${EVENTS_DB_USERNAME:-postgres}
@@ -147,8 +167,14 @@ services:
       KPI_ENGINE_BASE_URL: ${KPI_ENGINE_BASE_URL:-http://kpi-engine:8082}
     expose:
       - "8081"
-    mem_limit: 200m
-    cpus: 0.15
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/api/ingestion/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 180s
+    mem_limit: 600m
+    cpus: 0.5
 
   kpi-engine:
     build:
@@ -166,10 +192,43 @@ services:
     expose:
       - "8082"
     ports:
-      - "8083:8082"
-      
-    mem_limit: 200m
-    cpus: 0.15
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/api/kpi/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 180s
+    mem_limit: 600m
+    cpus: 0.5
+
+  bff-service:
+    build:
+      context: ./bff-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    depends_on:
+      data-ingestion-service-1:
+        condition: service_healthy
+      kpi-engine:
+        condition: service_healthy
+    environment:
+      AUTHSERVICE_URL: http://authservice-1:8080
+      INGESTION_URL: http://data-ingestion-service-1:8081
+      KPI_ENGINE_URL: http://kpi-engine:8082
+    ports:
+      - "8084:8084"
+    expose:
+      - "8084"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 180s
+    mem_limit: 600m
+    cpus: 0.5
 
   gateway:
     build:
@@ -179,23 +238,37 @@ services:
     restart: unless-stopped
     init: true
     depends_on:
-      - authservice-1
-      - authservice-2
-      - data-ingestion-service-1
-      - data-ingestion-service-2
-      - kpi-engine
+      authservice-1:
+        condition: service_healthy
+      authservice-2:
+        condition: service_healthy
+      data-ingestion-service-1:
+        condition: service_healthy
+      data-ingestion-service-2:
+        condition: service_healthy
+      kpi-engine:
+        condition: service_healthy
+      bff-service:
+        condition: service_healthy
     environment:
       AUTHSERVICE_1_URL: http://authservice-1:8080
       AUTHSERVICE_2_URL: http://authservice-2:8080
       INGESTION_1_URL: http://data-ingestion-service-1:8081
       INGESTION_2_URL: http://data-ingestion-service-2:8081
       KPI_ENGINE_URL: http://kpi-engine:8082
+      BFF_SERVICE_URL: http://bff-service:8084
       AUTH_VALIDATION_URL: http://authservice-1:8080/api/auth/validate
       FRONTEND_ORIGIN: http://localhost:5173
     ports:
       - "8080:8080"
-    mem_limit: 200m
-    cpus: 0.15
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 180s
+    mem_limit: 600m
+    cpus: 0.5
 
 volumes:
   postgres_data:
