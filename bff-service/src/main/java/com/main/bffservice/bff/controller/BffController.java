@@ -1,4 +1,11 @@
-package com.main.bffservice.bff.controller;
+﻿package com.main.bffservice.bff.controller;
+
+/*
+ * BffController - Controller REST.
+ * Responsibilities: Punto de entrada HTTP y validacion de requests.
+ * Patterns: MVC, BFF
+ */
+
 
 import com.main.bffservice.bff.dto.*;
 import com.main.bffservice.bff.service.BffService;
@@ -14,7 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/bff")
-@Tag(name = "BFF", description = "Endpoints para la agregación de datos y proxy de servicios")
+@Tag(name = "BFF", description = "Endpoints para la agregaciÃ³n de datos y proxy de servicios")
 public class BffController {
 
     private final BffService bffService;
@@ -24,7 +31,7 @@ public class BffController {
     }
 
     @GetMapping("/dashboard")
-    @Operation(summary = "Obtener Dashboard consolidado", description = "Recupera el estado de salud de los servicios y los últimos snapshots de KPIs.")
+    @Operation(summary = "Obtener Dashboard consolidado", description = "Recupera el estado de salud de los servicios y los Ãºltimos snapshots de KPIs.")
     public Mono<ResponseEntity<BffDashboardResponse>> getDashboard(@RequestParam Map<String, String> allParams) {
         return bffService.getDashboard(allParams).map(ResponseEntity::ok);
     }

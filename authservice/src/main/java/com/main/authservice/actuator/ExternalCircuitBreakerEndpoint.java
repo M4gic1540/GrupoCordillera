@@ -1,4 +1,11 @@
-package com.main.authservice.actuator;
+﻿package com.main.authservice.actuator;
+
+/*
+ * ExternalCircuitBreakerEndpoint - Actuator.
+ * Responsibilities: Extension de endpoints de salud/diagnostico.
+ * Patterns: Observability
+ */
+
 
 import com.main.authservice.service.ExternalIntegrationService;
 import java.util.Map;

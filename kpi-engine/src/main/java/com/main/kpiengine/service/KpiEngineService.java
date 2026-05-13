@@ -1,4 +1,11 @@
-package com.main.kpiengine.service;
+﻿package com.main.kpiengine.service;
+
+/*
+ * KpiEngineService - Service.
+ * Responsibilities: Orquesta logica de negocio y reglas del dominio.
+ * Patterns: Service Layer
+ */
+
 
 import com.main.kpiengine.domain.KpiDefinition;
 import com.main.kpiengine.domain.KpiSnapshot;
@@ -15,11 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 /**
- * Servicio de negocio para cálculo y consulta de indicadores (KPI).
+ * Servicio de negocio para cÃ¡lculo y consulta de indicadores (KPI).
  *
- * <p>Orquesta repositorios de definición/snapshot para:
- * 1) asegurar catálogo mínimo de KPIs,
- * 2) calcular snapshots por evento de ingestión,
+ * <p>Orquesta repositorios de definiciÃ³n/snapshot para:
+ * 1) asegurar catÃ¡logo mÃ­nimo de KPIs,
+ * 2) calcular snapshots por evento de ingestiÃ³n,
  * 3) exponer resultados listos para API.</p>
  */
 public class KpiEngineService {
@@ -60,9 +67,9 @@ public class KpiEngineService {
     }
 
     /**
-     * Consulta los snapshots más recientes para visualización en dashboard/API.
+     * Consulta los snapshots mÃ¡s recientes para visualizaciÃ³n en dashboard/API.
      *
-     * @return hasta 20 snapshots ordenados del más reciente al más antiguo.
+     * @return hasta 20 snapshots ordenados del mÃ¡s reciente al mÃ¡s antiguo.
      */
     @Transactional(readOnly = true)
     public List<KpiSnapshotResponse> getLatestSnapshots() {
@@ -72,12 +79,12 @@ public class KpiEngineService {
     }
 
     /**
-     * Garantiza existencia de una definición KPI; si no existe, la crea.
+     * Garantiza existencia de una definiciÃ³n KPI; si no existe, la crea.
      *
-     * @param code identificador único funcional del KPI.
+     * @param code identificador Ãºnico funcional del KPI.
      * @param name nombre legible para API/dashboard.
-     * @param frequency frecuencia semántica de actualización.
-     * @return definición existente o recién persistida.
+     * @param frequency frecuencia semÃ¡ntica de actualizaciÃ³n.
+     * @return definiciÃ³n existente o reciÃ©n persistida.
      */
     private KpiDefinition ensureDefinition(String code, String name, String frequency) {
         return definitionRepository.findByCode(code)
@@ -91,12 +98,12 @@ public class KpiEngineService {
     }
 
     /**
-     * Construye una entidad snapshot con metadatos de recálculo.
+     * Construye una entidad snapshot con metadatos de recÃ¡lculo.
      *
-     * @param definition definición KPI asociada.
-     * @param request payload origen del recálculo.
-     * @param computedAt instante de cálculo.
-     * @param value valor numérico calculado del indicador.
+     * @param definition definiciÃ³n KPI asociada.
+     * @param request payload origen del recÃ¡lculo.
+     * @param computedAt instante de cÃ¡lculo.
+     * @param value valor numÃ©rico calculado del indicador.
      * @return snapshot listo para persistencia.
      */
     private KpiSnapshot buildSnapshot(KpiDefinition definition,
@@ -113,13 +120,13 @@ public class KpiEngineService {
     }
 
     /**
-     * Calcula un índice de calidad simplificado a partir de volumen procesado.
+     * Calcula un Ã­ndice de calidad simplificado a partir de volumen procesado.
      *
-     * <p>La función limita máximos para evitar valores desproporcionados y
+     * <p>La funciÃ³n limita mÃ¡ximos para evitar valores desproporcionados y
      * normaliza con escala fija para consistencia en reportes.</p>
      *
-     * @param affectedRecords cantidad de registros que detonaron recálculo.
-     * @return índice de calidad redondeado a 2 decimales.
+     * @param affectedRecords cantidad de registros que detonaron recÃ¡lculo.
+     * @return Ã­ndice de calidad redondeado a 2 decimales.
      */
     private BigDecimal computeQualityIndex(int affectedRecords) {
         if (affectedRecords <= 0) {

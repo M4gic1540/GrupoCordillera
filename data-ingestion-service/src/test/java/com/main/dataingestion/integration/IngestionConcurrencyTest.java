@@ -1,4 +1,11 @@
-package com.main.dataingestion.integration;
+﻿package com.main.dataingestion.integration;
+
+/*
+ * IngestionConcurrencyTest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

@@ -1,4 +1,11 @@
-package com.main.authservice.service;
+﻿package com.main.authservice.service;
+
+/*
+ * AuthServicePasswordHashingTest - Service.
+ * Responsibilities: Orquesta logica de negocio y reglas del dominio.
+ * Patterns: Service Layer
+ */
+
 
 import com.main.authservice.dto.RegisterRequest;
 import com.main.authservice.model.User;

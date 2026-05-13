@@ -1,4 +1,11 @@
-package com.main.dataingestion.controller;
+﻿package com.main.dataingestion.controller;
+
+/*
+ * IngestionControllerValidationTest - Controller REST.
+ * Responsibilities: Punto de entrada HTTP y validacion de requests.
+ * Patterns: MVC
+ */
+
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

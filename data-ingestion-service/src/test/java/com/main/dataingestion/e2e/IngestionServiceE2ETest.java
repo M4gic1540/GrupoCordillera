@@ -1,4 +1,11 @@
-package com.main.dataingestion.e2e;
+﻿package com.main.dataingestion.e2e;
+
+/*
+ * IngestionServiceE2ETest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import java.time.OffsetDateTime;
 

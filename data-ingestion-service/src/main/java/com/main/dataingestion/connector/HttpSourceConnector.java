@@ -1,4 +1,11 @@
-package com.main.dataingestion.connector;
+﻿package com.main.dataingestion.connector;
+
+/*
+ * HttpSourceConnector - Integration.
+ * Responsibilities: Abstraccion/implementacion de conectores externos.
+ * Patterns: Strategy
+ */
+
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.main.dataingestion.config.SourceSystemsProperties.SourceSystemConfig;

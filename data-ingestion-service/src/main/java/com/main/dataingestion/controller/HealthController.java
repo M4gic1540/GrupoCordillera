@@ -1,4 +1,11 @@
-package com.main.dataingestion.controller;
+﻿package com.main.dataingestion.controller;
+
+/*
+ * HealthController - Controller REST.
+ * Responsibilities: Punto de entrada HTTP y validacion de requests.
+ * Patterns: MVC
+ */
+
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

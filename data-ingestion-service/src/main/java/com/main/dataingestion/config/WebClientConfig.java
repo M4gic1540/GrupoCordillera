@@ -1,4 +1,11 @@
-package com.main.dataingestion.config;
+﻿package com.main.dataingestion.config;
+
+/*
+ * WebClientConfig - Config.
+ * Responsibilities: Configuracion de beans y propiedades externas.
+ * Patterns: Configuration
+ */
+
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

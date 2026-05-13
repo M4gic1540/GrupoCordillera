@@ -1,4 +1,11 @@
-package ${package}.controller;
+﻿package ${package}.controller;
+
+/*
+ * HealthController - Controller REST.
+ * Responsibilities: Punto de entrada HTTP y validacion de requests.
+ * Patterns: MVC
+ */
+
 
 import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,4 +21,3 @@ public class HealthController {
         return Map.of("status", "UP", "service", "${artifactId}");
     }
 }
-

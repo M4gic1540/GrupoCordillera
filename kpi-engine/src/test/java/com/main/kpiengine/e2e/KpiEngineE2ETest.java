@@ -1,4 +1,11 @@
-package com.main.kpiengine.e2e;
+﻿package com.main.kpiengine.e2e;
+
+/*
+ * KpiEngineE2ETest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

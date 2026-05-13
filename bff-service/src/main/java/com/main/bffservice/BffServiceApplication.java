@@ -1,4 +1,11 @@
-package com.main.bffservice;
+﻿package com.main.bffservice;
+
+/*
+ * BffServiceApplication - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import com.main.bffservice.bff.config.BffProperties;
 import org.springframework.boot.SpringApplication;

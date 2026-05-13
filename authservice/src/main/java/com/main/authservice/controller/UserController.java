@@ -1,4 +1,11 @@
-package com.main.authservice.controller;
+﻿package com.main.authservice.controller;
+
+/*
+ * UserController - Controller REST.
+ * Responsibilities: Punto de entrada HTTP y validacion de requests.
+ * Patterns: MVC
+ */
+
 
 import com.main.authservice.dto.UpdateUserRequest;
 import com.main.authservice.dto.UpdateUserRoleRequest;

@@ -1,4 +1,11 @@
-package com.main.bffservice.bff.exception;
+﻿package com.main.bffservice.bff.exception;
+
+/*
+ * GlobalExceptionHandler - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: BFF
+ */
+
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

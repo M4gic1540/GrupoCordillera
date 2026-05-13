@@ -1,4 +1,11 @@
-package com.main.authservice.security;
+﻿package com.main.authservice.security;
+
+/*
+ * JwtService - Security.
+ * Responsibilities: Autenticacion, autorizacion y validacion JWT.
+ * Patterns: Security Filter
+ */
+
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

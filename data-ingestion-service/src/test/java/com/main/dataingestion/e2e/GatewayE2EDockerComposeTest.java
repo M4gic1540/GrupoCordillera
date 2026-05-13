@@ -1,4 +1,11 @@
-package com.main.dataingestion.e2e;
+﻿package com.main.dataingestion.e2e;
+
+/*
+ * GatewayE2EDockerComposeTest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 

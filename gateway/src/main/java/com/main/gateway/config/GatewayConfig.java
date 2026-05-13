@@ -1,5 +1,12 @@
-// Paquete config: centraliza configuración gateway
+﻿// Paquete config: centraliza configuraciÃ³n gateway
 package com.main.gateway.config;
+
+/*
+ * GatewayConfig - Config.
+ * Responsibilities: Configuracion de beans y propiedades externas.
+ * Patterns: Configuration
+ */
+
 
 
 // Importa anotaciones Spring y dependencias de propiedades
@@ -16,9 +23,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.main.gateway.security.GatewaySecurityProperties;
 
 
-// Marca clase como configuración Spring
+// Marca clase como configuraciÃ³n Spring
 @Configuration
-// Habilita inyección de propiedades de seguridad
+// Habilita inyecciÃ³n de propiedades de seguridad
 @EnableConfigurationProperties({GatewaySecurityProperties.class})
 public class GatewayConfig {
 
@@ -31,7 +38,7 @@ public class GatewayConfig {
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        // Permitimos el origen del frontend explícitamente. 
+        // Permitimos el origen del frontend explÃ­citamente. 
         // Nota: Con allowCredentials(true), no se puede usar "*" en origins.
         corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
         corsConfig.setMaxAge(3600L);

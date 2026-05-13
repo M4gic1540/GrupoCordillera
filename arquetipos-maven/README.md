@@ -46,4 +46,3 @@ El comando anterior genera:
 ## Recomendacion de uso
 
 Utilizar este arquetipo como punto de partida para nuevos microservicios y aplicar convenciones de rama/documentacion definidas en la entrega.
-

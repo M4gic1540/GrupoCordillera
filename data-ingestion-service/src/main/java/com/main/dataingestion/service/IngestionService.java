@@ -1,4 +1,11 @@
-package com.main.dataingestion.service;
+﻿package com.main.dataingestion.service;
+
+/*
+ * IngestionService - Service.
+ * Responsibilities: Orquesta logica de negocio y reglas del dominio.
+ * Patterns: Service Layer
+ */
+
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.main.dataingestion.connector.ConnectorFactory;

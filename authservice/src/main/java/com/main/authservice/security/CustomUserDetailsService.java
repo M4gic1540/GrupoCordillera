@@ -1,4 +1,11 @@
-package com.main.authservice.security;
+﻿package com.main.authservice.security;
+
+/*
+ * CustomUserDetailsService - Security.
+ * Responsibilities: Autenticacion, autorizacion y validacion JWT.
+ * Patterns: Security Filter
+ */
+
 
 import com.main.authservice.repository.UserRepository;
 import org.slf4j.Logger;

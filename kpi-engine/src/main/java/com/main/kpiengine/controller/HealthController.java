@@ -1,4 +1,11 @@
-package com.main.kpiengine.controller;
+﻿package com.main.kpiengine.controller;
+
+/*
+ * HealthController - Controller REST.
+ * Responsibilities: Punto de entrada HTTP y validacion de requests.
+ * Patterns: MVC
+ */
+
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Controlador liviano de salud operativa del servicio KPI.
  *
- * <p>Sirve para checks básicos de disponibilidad desde gateway, orquestador
+ * <p>Sirve para checks bÃ¡sicos de disponibilidad desde gateway, orquestador
  * o monitoreo externo.</p>
  */
 @RestController

@@ -1,4 +1,11 @@
-package com.main.bffservice.bff.dto;
+﻿package com.main.bffservice.bff.dto;
+
+/*
+ * RecalculateKpiResponse - DTO.
+ * Responsibilities: Contrato de datos para capa API.
+ * Patterns: DTO, BFF
+ */
+
 
 import java.util.List;
 

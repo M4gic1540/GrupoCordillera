@@ -1,4 +1,11 @@
-package com.main.dataingestion.integration;
+﻿package com.main.dataingestion.integration;
+
+/*
+ * IngestionMicroservicesIntegrationTest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -102,15 +109,15 @@ class IngestionMicroservicesIntegrationTest {
         IngestionService service = new IngestionService(connectorFactory, eventRepository, syncRunRepository, kpiNotificationService);
 
         IngestionService.SyncResult result = null;
-        // Evitar fallos intermitentes en CI cuando los servidores locales no están listos en el primer intento.
+        // Evitar fallos intermitentes en CI cuando los servidores locales no estÃ¡n listos en el primer intento.
         for (int attempt = 0; attempt < 3; attempt++) {
             result = service.ingest("crm");
             if (result.processedRecords() == 2) {
-                // Limpiar invocaciones previas para verificar solo la ejecución exitosa
+                // Limpiar invocaciones previas para verificar solo la ejecuciÃ³n exitosa
                 org.mockito.Mockito.clearInvocations(eventRepository);
                 org.mockito.Mockito.clearInvocations(syncRunRepository);
 
-                // Ejecutar nuevamente para capturar solo la interacción correcta
+                // Ejecutar nuevamente para capturar solo la interacciÃ³n correcta
                 result = service.ingest("crm");
 
                 assertEquals("crm", result.sourceSystem());
@@ -133,7 +140,7 @@ class IngestionMicroservicesIntegrationTest {
             Thread.sleep(120);
         }
         // Si nunca se obtuvo el resultado esperado, falla el test
-        throw new AssertionError("No se logró procesar 2 registros en ingest después de 3 intentos");
+        throw new AssertionError("No se logrÃ³ procesar 2 registros en ingest despuÃ©s de 3 intentos");
     }
 
     @Test

@@ -1,4 +1,11 @@
-package com.main.bffservice.bff.dto;
+﻿package com.main.bffservice.bff.dto;
+
+/*
+ * RegisterRequest - DTO.
+ * Responsibilities: Contrato de datos para capa API.
+ * Patterns: DTO, BFF
+ */
+
 
 public class RegisterRequest {
     private String email;

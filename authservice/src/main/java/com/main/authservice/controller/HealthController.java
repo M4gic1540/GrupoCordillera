@@ -1,4 +1,11 @@
-package com.main.authservice.controller;
+﻿package com.main.authservice.controller;
+
+/*
+ * HealthController - Controller REST.
+ * Responsibilities: Punto de entrada HTTP y validacion de requests.
+ * Patterns: MVC
+ */
+
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Health", description = "Estado operativo del microservicio de autenticación")
+@Tag(name = "Health", description = "Estado operativo del microservicio de autenticaciÃ³n")
 public class HealthController {
 
     @GetMapping("/health")

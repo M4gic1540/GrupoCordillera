@@ -1,4 +1,11 @@
-package com.main.bffservice.bff.service;
+﻿package com.main.bffservice.bff.service;
+
+/*
+ * BffService - Service.
+ * Responsibilities: Orquesta logica de negocio y reglas del dominio.
+ * Patterns: Service Layer, BFF
+ */
+
 
 import com.main.bffservice.bff.config.BffProperties;
 import com.main.bffservice.bff.dto.*;

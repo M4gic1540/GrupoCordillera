@@ -46,4 +46,3 @@ docker-compose up --build
 
 - El servicio usa `ConnectorFactory` para resolver conectores por fuente.
 - Implementa validaciones de payload y deduplicacion en memoria por corrida.
-

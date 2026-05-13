@@ -1,4 +1,11 @@
-package com.main.dataingestion.config;
+﻿package com.main.dataingestion.config;
+
+/*
+ * OpenApiConfig - Config.
+ * Responsibilities: Configuracion de beans y propiedades externas.
+ * Patterns: Configuration
+ */
+
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;

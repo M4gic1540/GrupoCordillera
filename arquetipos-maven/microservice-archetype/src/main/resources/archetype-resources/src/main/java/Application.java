@@ -1,4 +1,11 @@
-package ${package};
+﻿package ${package};
+
+/*
+ * Application - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,4 +17,3 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 }
-

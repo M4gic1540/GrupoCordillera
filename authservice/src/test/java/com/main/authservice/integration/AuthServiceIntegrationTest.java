@@ -1,4 +1,11 @@
-package com.main.authservice.integration;
+﻿package com.main.authservice.integration;
+
+/*
+ * AuthServiceIntegrationTest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

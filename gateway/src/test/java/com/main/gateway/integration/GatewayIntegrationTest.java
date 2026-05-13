@@ -1,4 +1,11 @@
-package com.main.gateway.integration;
+﻿package com.main.gateway.integration;
+
+/*
+ * GatewayIntegrationTest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import static org.springframework.test.web.reactive.server.WebTestClient.bindToServer;
 

@@ -1,4 +1,11 @@
-package com.main.dataingestion.controller;
+﻿package com.main.dataingestion.controller;
+
+/*
+ * IngestionController - Controller REST.
+ * Responsibilities: Punto de entrada HTTP y validacion de requests.
+ * Patterns: MVC
+ */
+
 
 import com.main.dataingestion.service.IngestionService;
 import com.main.dataingestion.service.IngestionService.SyncResult;

@@ -1,4 +1,11 @@
-package com.main.bffservice.bff.dto;
+﻿package com.main.bffservice.bff.dto;
+
+/*
+ * UserResponse - DTO.
+ * Responsibilities: Contrato de datos para capa API.
+ * Patterns: DTO, BFF
+ */
+
 
 import java.time.Instant;
 

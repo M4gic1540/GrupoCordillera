@@ -1,4 +1,11 @@
-package com.main.gateway.e2e;
+﻿package com.main.gateway.e2e;
+
+/*
+ * GatewayE2ETest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import static org.springframework.test.web.reactive.server.WebTestClient.bindToServer;
 

@@ -1,4 +1,11 @@
-package com.main.dataingestion.controller;
+﻿package com.main.dataingestion.controller;
+
+/*
+ * ApiExceptionHandler - Controller REST.
+ * Responsibilities: Punto de entrada HTTP y validacion de requests.
+ * Patterns: MVC
+ */
+
 
 import jakarta.validation.ConstraintViolationException;
 import java.util.Map;

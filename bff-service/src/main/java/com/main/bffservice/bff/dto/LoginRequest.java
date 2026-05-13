@@ -1,4 +1,11 @@
-package com.main.bffservice.bff.dto;
+﻿package com.main.bffservice.bff.dto;
+
+/*
+ * LoginRequest - DTO.
+ * Responsibilities: Contrato de datos para capa API.
+ * Patterns: DTO, BFF
+ */
+
 
 public class LoginRequest {
     private String email;

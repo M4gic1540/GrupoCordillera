@@ -1,4 +1,11 @@
-package com.main.gateway.performance;
+﻿package com.main.gateway.performance;
+
+/*
+ * GatewayPerformanceTest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import java.time.Duration;
 import java.util.stream.IntStream;

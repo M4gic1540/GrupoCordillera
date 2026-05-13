@@ -37,4 +37,3 @@ Microservicio encargado de calcular y exponer indicadores KPI a partir de evento
 
 - Aplica `Repository Pattern` para definiciones y snapshots.
 - Expone DTOs desacoplados de entidades para el consumo del BFF.
-

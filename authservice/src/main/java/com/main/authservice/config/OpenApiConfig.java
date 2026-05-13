@@ -1,4 +1,11 @@
-package com.main.authservice.config;
+﻿package com.main.authservice.config;
+
+/*
+ * OpenApiConfig - Config.
+ * Responsibilities: Configuracion de beans y propiedades externas.
+ * Patterns: Configuration
+ */
+
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

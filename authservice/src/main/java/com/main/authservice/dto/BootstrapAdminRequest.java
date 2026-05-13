@@ -1,4 +1,11 @@
-package com.main.authservice.dto;
+﻿package com.main.authservice.dto;
+
+/*
+ * BootstrapAdminRequest - DTO.
+ * Responsibilities: Contrato de datos para capa API.
+ * Patterns: DTO
+ */
+
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

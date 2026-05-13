@@ -1,4 +1,11 @@
-package com.main.bffservice.config;
+﻿package com.main.bffservice.config;
+
+/*
+ * BffConfig - Config.
+ * Responsibilities: Configuracion de beans y propiedades externas.
+ * Patterns: Configuration
+ */
+
 
 import com.main.bffservice.bff.config.BffProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

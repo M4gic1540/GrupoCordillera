@@ -1,4 +1,11 @@
-package com.main.authservice.repository;
+﻿package com.main.authservice.repository;
+
+/*
+ * UserRepository - Repository.
+ * Responsibilities: Acceso a datos mediante Spring Data JPA.
+ * Patterns: Repository
+ */
+
 
 import com.main.authservice.model.User;
 import java.util.Optional;

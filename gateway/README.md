@@ -45,4 +45,3 @@ Puerta de entrada unica para el ecosistema backend. Centraliza rutas, CORS y aut
 
 - El filtro global `AuthenticationFilter` valida JWT delegando en Auth Service.
 - Se recomienda consumir siempre por el gateway desde el frontend.
-

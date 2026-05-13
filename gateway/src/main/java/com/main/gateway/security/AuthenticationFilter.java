@@ -1,4 +1,11 @@
-package com.main.gateway.security;
+﻿package com.main.gateway.security;
+
+/*
+ * AuthenticationFilter - Security.
+ * Responsibilities: Autenticacion, autorizacion y validacion JWT.
+ * Patterns: Security Filter
+ */
+
 
 import java.util.List;
 
@@ -31,7 +38,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     /**
      * Intercepta requests del gateway y exige token para rutas protegidas.
      *
-     * <p>La validación real se delega a authservice vía endpoint /validate.</p>
+     * <p>La validaciÃ³n real se delega a authservice vÃ­a endpoint /validate.</p>
      */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -68,7 +75,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     }
 
     /**
-     * Decide si el path requiere autenticación según reglas configuradas.
+     * Decide si el path requiere autenticaciÃ³n segÃºn reglas configuradas.
      */
     private boolean requiresAuthentication(String requestPath) {
         if (matchesAny(requestPath, properties.getExcludedPaths())) {
@@ -78,7 +85,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     }
 
     /**
-     * Evalúa si el path hace match contra alguna regla ant-style.
+     * EvalÃºa si el path hace match contra alguna regla ant-style.
      */
     private boolean matchesAny(String path, List<String> patterns) {
         for (String pattern : patterns) {

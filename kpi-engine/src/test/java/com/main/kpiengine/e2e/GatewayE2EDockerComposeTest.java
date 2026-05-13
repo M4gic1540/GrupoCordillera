@@ -1,4 +1,11 @@
-package com.main.kpiengine.e2e;
+﻿package com.main.kpiengine.e2e;
+
+/*
+ * GatewayE2EDockerComposeTest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

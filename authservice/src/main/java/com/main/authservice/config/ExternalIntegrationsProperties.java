@@ -1,4 +1,11 @@
-package com.main.authservice.config;
+﻿package com.main.authservice.config;
+
+/*
+ * ExternalIntegrationsProperties - Config.
+ * Responsibilities: Configuracion de beans y propiedades externas.
+ * Patterns: Configuration
+ */
+
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
