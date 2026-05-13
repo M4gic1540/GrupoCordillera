@@ -1,4 +1,11 @@
-package com.main.authservice.dto;
+﻿package com.main.authservice.dto;
+
+/*
+ * AuthResponse - DTO.
+ * Responsibilities: Contrato de datos para capa API.
+ * Patterns: DTO
+ */
+
 
 import com.main.authservice.model.Role;
 

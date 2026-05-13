@@ -1,4 +1,11 @@
-package com.main.gateway.security;
+﻿package com.main.gateway.security;
+
+/*
+ * GatewaySecurityTest - Security.
+ * Responsibilities: Autenticacion, autorizacion y validacion JWT.
+ * Patterns: Security Filter
+ */
+
 
 import static org.springframework.test.web.reactive.server.WebTestClient.bindToServer;
 

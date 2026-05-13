@@ -1,4 +1,11 @@
-package com.main.dataingestion.config;
+﻿package com.main.dataingestion.config;
+
+/*
+ * SourceSystemsProperties - Config.
+ * Responsibilities: Configuracion de beans y propiedades externas.
+ * Patterns: Configuration
+ */
+
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

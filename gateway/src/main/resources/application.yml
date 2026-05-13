@@ -12,75 +12,23 @@ gateway:
     auth-validation-url: ${AUTH_VALIDATION_URL:http://authservice-1:8080/api/auth/validate}
     protected-paths:
       - /bff/**
-      - /api/ingestion/**
-      - /api/kpi/**
-      - /api/**
     excluded-paths:
-      - /api/auth/**
-      - /actuator/**
-      - /kpi/**
-
-bff:
-  auth-base-url: ${AUTHSERVICE_1_URL:http://authservice-1:8080}
-  ingestion-base-url: ${INGESTION_1_URL:http://data-ingestion-service-1:8081}
-  kpi-base-url: ${KPI_ENGINE_URL:http://kpi-engine:8082}
+      - /bff/auth/login
+      - /bff/auth/register
+      - /bff/auth/refresh
+      - /bff/system/health
+      - /bff/v3/api-docs
+      - /bff/docs/**
+      - /swagger-ui/**
+      - /v3/api-docs/**
 
 spring:
   cloud:
     gateway:
-      globalcors:
-        add-to-simple-url-handler-mapping: true
-        cors-configurations:
-          '[/**]':
-            allowedOrigins:
-              - ${FRONTEND_ORIGIN:http://localhost:5173}
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - PATCH
-              - DELETE
-              - OPTIONS
-            allowedHeaders:
-              - Authorization
-              - Content-Type
-              - Accept
-              - Origin
-              - X-Requested-With
-              - X-Correlation-ID
-            allowCredentials: false
       default-filters:
         - PreserveHostHeader
-        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
       routes:
-        - id: auth-route-1
-          uri: ${AUTHSERVICE_1_URL:http://authservice-1:8080}
+        - id: bff-route
+          uri: ${BFF_SERVICE_URL:http://bff-service:8084}
           predicates:
-            - Path=/api/auth/**
-
-        - id: ingestion-route-1
-          uri: ${INGESTION_1_URL:http://data-ingestion-service-1:8081}
-          predicates:
-            - Path=/api/ingestion/**
-            - Weight=ingestion-group,50
-
-        - id: ingestion-route-2
-          uri: ${INGESTION_2_URL:http://data-ingestion-service-2:8081}
-          predicates:
-            - Path=/api/ingestion/**
-            - Weight=ingestion-group,50
-
-        - id: kpi-api-route
-          uri: ${KPI_ENGINE_URL:http://kpi-engine:8082}
-          predicates:
-            - Path=/api/kpi/**
-
-        - id: kpi-docs-route
-          uri: ${KPI_ENGINE_URL:http://kpi-engine:8082}
-          predicates:
-            - Path=/kpi/**
-
-        - id: api-fallback-auth-1
-          uri: ${AUTHSERVICE_1_URL:http://authservice-1:8080}
-          predicates:
-            - Path=/api/**
+            - Path=/bff/**

@@ -1,4 +1,11 @@
-package com.main.authservice.model;
+﻿package com.main.authservice.model;
+
+/*
+ * RefreshToken - Domain Model.
+ * Responsibilities: Entidad del dominio y mapeo de persistencia.
+ * Patterns: Domain Model
+ */
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

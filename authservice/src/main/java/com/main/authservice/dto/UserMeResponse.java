@@ -1,4 +1,11 @@
-package com.main.authservice.dto;
+﻿package com.main.authservice.dto;
+
+/*
+ * UserMeResponse - DTO.
+ * Responsibilities: Contrato de datos para capa API.
+ * Patterns: DTO
+ */
+
 
 import com.main.authservice.model.Role;
 import java.time.Instant;

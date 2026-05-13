@@ -1,4 +1,11 @@
-package com.main.kpiengine;
+﻿package com.main.kpiengine;
+
+/*
+ * KpiEngineApplication - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,16 +13,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Punto de entrada del microservicio KPI Engine.
  *
- * <p>Arranca el contexto Spring Boot y habilita autoconfiguración de
- * componentes (web, JPA, validación, etc.) para el servicio de KPIs.</p>
+ * <p>Arranca el contexto Spring Boot y habilita autoconfiguraciÃ³n de
+ * componentes (web, JPA, validaciÃ³n, etc.) para el servicio de KPIs.</p>
  */
 @SpringBootApplication
 public class KpiEngineApplication {
 
     /**
-     * Método principal de arranque de la aplicación.
+     * MÃ©todo principal de arranque de la aplicaciÃ³n.
      *
-     * @param args argumentos de línea de comandos del proceso Java.
+     * @param args argumentos de lÃ­nea de comandos del proceso Java.
      */
     public static void main(String[] args) {
         SpringApplication.run(KpiEngineApplication.class, args);

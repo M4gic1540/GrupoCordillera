@@ -1,4 +1,11 @@
-package com.main.authservice.controller;
+﻿package com.main.authservice.controller;
+
+/*
+ * AuthController - Controller REST.
+ * Responsibilities: Punto de entrada HTTP y validacion de requests.
+ * Patterns: MVC
+ */
+
 
 import com.main.authservice.dto.AuthResponse;
 import com.main.authservice.dto.BootstrapAdminRequest;
@@ -30,6 +37,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 /**
  * Controlador REST para operaciones de autenticacion.
+ *
+ * <p>Expone endpoints de registro, login, refresh y validacion de token. Actua como capa
+ * de entrada (controller) y delega la logica de negocio en {@link AuthService} y la
+ * gestion de JWT en {@link JwtService}. La validacion es usada por el API Gateway
+ * para proteger el trafico interno (patron API Gateway + BFF).</p>
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -124,6 +136,7 @@ public class AuthController {
     public ResponseEntity<Void> validateAccessToken(
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization
     ) {
+        // El gateway solo necesita saber si el JWT es valido para permitir el enrutamiento.
         if (!StringUtils.hasText(authorization) || !authorization.startsWith("Bearer ")) {
             logger.debug("JWT validation rejected: missing bearer header");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

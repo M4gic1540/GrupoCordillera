@@ -1,4 +1,11 @@
-package com.main.authservice.config;
+﻿package com.main.authservice.config;
+
+/*
+ * CorrelationIdFilter - Config.
+ * Responsibilities: Configuracion de beans y propiedades externas.
+ * Patterns: Configuration
+ */
+
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,4 +1,11 @@
-package com.main.authservice.repository;
+﻿package com.main.authservice.repository;
+
+/*
+ * RefreshTokenRepository - Repository.
+ * Responsibilities: Acceso a datos mediante Spring Data JPA.
+ * Patterns: Repository
+ */
+
 
 import com.main.authservice.model.RefreshToken;
 import com.main.authservice.model.User;

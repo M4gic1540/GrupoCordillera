@@ -1,4 +1,11 @@
-package com.main.authservice.service;
+﻿package com.main.authservice.service;
+
+/*
+ * ExternalIntegrationFactoryMethodTest - Service.
+ * Responsibilities: Orquesta logica de negocio y reglas del dominio.
+ * Patterns: Service Layer, Factory Method
+ */
+
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;

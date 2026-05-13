@@ -1,4 +1,11 @@
-package com.main.authservice.integration;
+﻿package com.main.authservice.integration;
+
+/*
+ * AuthServiceE2ETest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

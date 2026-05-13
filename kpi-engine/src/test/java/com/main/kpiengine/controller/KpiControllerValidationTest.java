@@ -1,4 +1,11 @@
-package com.main.kpiengine.controller;
+﻿package com.main.kpiengine.controller;
+
+/*
+ * KpiControllerValidationTest - Controller REST.
+ * Responsibilities: Punto de entrada HTTP y validacion de requests.
+ * Patterns: MVC
+ */
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

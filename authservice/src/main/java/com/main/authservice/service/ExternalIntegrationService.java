@@ -1,4 +1,11 @@
-package com.main.authservice.service;
+﻿package com.main.authservice.service;
+
+/*
+ * ExternalIntegrationService - Service.
+ * Responsibilities: Orquesta logica de negocio y reglas del dominio.
+ * Patterns: Service Layer
+ */
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,9 +64,9 @@ public class ExternalIntegrationService {
         try {
             externalCallsCircuitBreaker.executeRunnable(() -> doNotifyUserRegistered(user, connectorType));
         } catch (CallNotPermittedException ex) {
-            logger.warn("Circuit breaker abierto para integraciones externas, se omite notificación de registro userId={}", user.getId());
+            logger.warn("Circuit breaker abierto para integraciones externas, se omite notificaciÃ³n de registro userId={}", user.getId());
         } catch (Exception ex) {
-            logger.warn("Fallo en integración externa post-registro para userId={}: {}", user.getId(), ex.getMessage());
+            logger.warn("Fallo en integraciÃ³n externa post-registro para userId={}: {}", user.getId(), ex.getMessage());
         }
     }
 
@@ -81,7 +88,7 @@ public class ExternalIntegrationService {
         ExternalConnector connector = ConnectorFactory.createConnector(connectorType);
         logger.info("Usando conector externo tipo {} para userId={}", connector.getType(), user.getId());
         connector.connect();
-        // Aquí podrías llamar métodos como connector.sendData(user) si los defines en la interfaz
+        // AquÃ­ podrÃ­as llamar mÃ©todos como connector.sendData(user) si los defines en la interfaz
     }
 
     private String buildPayload(User user) {
@@ -95,7 +102,7 @@ public class ExternalIntegrationService {
         try {
             return objectMapper.writeValueAsString(payload);
         } catch (JsonProcessingException ex) {
-            throw new IllegalStateException("No fue posible serializar payload de integración", ex);
+            throw new IllegalStateException("No fue posible serializar payload de integraciÃ³n", ex);
         }
     }
 }

@@ -1,4 +1,11 @@
-package com.main.dataingestion.domain;
+﻿package com.main.dataingestion.domain;
+
+/*
+ * IngestionEvent - Domain Model.
+ * Responsibilities: Entidad del dominio y mapeo de persistencia.
+ * Patterns: Domain Model
+ */
+
 
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.Column;

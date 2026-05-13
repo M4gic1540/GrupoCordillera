@@ -1,4 +1,11 @@
-package com.main.kpiengine.controller;
+﻿package com.main.kpiengine.controller;
+
+/*
+ * ApiExceptionHandler - Controller REST.
+ * Responsibilities: Punto de entrada HTTP y validacion de requests.
+ * Patterns: MVC
+ */
+
 
 import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
@@ -22,9 +29,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ApiExceptionHandler {
 
     /**
-     * Maneja errores de validación de bean validation en payloads.
+     * Maneja errores de validaciÃ³n de bean validation en payloads.
      *
-     * @param ex excepción con detalle de campos inválidos.
+     * @param ex excepciÃ³n con detalle de campos invÃ¡lidos.
      * @return respuesta 400 con lista de errores por campo.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -49,8 +56,8 @@ public class ApiExceptionHandler {
     /**
      * Maneja body ausente o JSON mal formado.
      *
-     * @param ex excepción de deserialización/parsing.
-     * @return respuesta 400 con mensaje estándar de formato inválido.
+     * @param ex excepciÃ³n de deserializaciÃ³n/parsing.
+     * @return respuesta 400 con mensaje estÃ¡ndar de formato invÃ¡lido.
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> handleMalformedJson(HttpMessageNotReadableException ex) {
@@ -63,10 +70,10 @@ public class ApiExceptionHandler {
     }
 
     /**
-     * Fallback genérico para errores no controlados explícitamente.
+     * Fallback genÃ©rico para errores no controlados explÃ­citamente.
      *
-     * @param ex excepción inesperada.
-     * @return respuesta 500 con mensaje genérico.
+     * @param ex excepciÃ³n inesperada.
+     * @return respuesta 500 con mensaje genÃ©rico.
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {

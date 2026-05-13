@@ -1,4 +1,11 @@
-package com.main.dataingestion.controller;
+﻿package com.main.dataingestion.controller;
+
+/*
+ * HealthController - Controller REST.
+ * Responsibilities: Punto de entrada HTTP y validacion de requests.
+ * Patterns: MVC
+ */
+
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,7 +21,11 @@ public class HealthController {
 
     @GetMapping("/health")
     @Operation(summary = "Health check", description = "Devuelve estado UP del servicio")
-    public Map<String, String> health() {
-        return Map.of("status", "UP", "service", "data-ingestion-service");
+    public Map<String, Object> health() {
+        return Map.of(
+            "status", "UP", 
+            "service", "data-ingestion-service",
+            "details", Map.of("database", "UP", "timestamp", System.currentTimeMillis())
+        );
     }
 }

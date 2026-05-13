@@ -1,4 +1,11 @@
-package com.main.authservice.exception;
+﻿package com.main.authservice.exception;
+
+/*
+ * ApiExceptionHandler - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;

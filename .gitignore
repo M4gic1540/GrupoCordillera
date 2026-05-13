@@ -10,7 +10,6 @@ target/
 INFORME_VULNERABILIDADES.tex
 INFORME_KPI_ENGINE.tex
 INFORME_GATEWAY.tex
-.github
 Logs
 diagramas/UMLKPIEngine.mmd
 diagramas/UMLGateway.mmd

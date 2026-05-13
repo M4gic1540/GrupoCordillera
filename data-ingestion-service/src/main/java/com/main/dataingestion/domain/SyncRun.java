@@ -1,4 +1,11 @@
-package com.main.dataingestion.domain;
+﻿package com.main.dataingestion.domain;
+
+/*
+ * SyncRun - Domain Model.
+ * Responsibilities: Entidad del dominio y mapeo de persistencia.
+ * Patterns: Domain Model
+ */
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

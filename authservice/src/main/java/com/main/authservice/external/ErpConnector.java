@@ -1,4 +1,11 @@
-package com.main.authservice.external;
+﻿package com.main.authservice.external;
+
+/*
+ * ErpConnector - Integration.
+ * Responsibilities: Abstraccion/implementacion de conectores externos.
+ * Patterns: Strategy
+ */
+
 
 public class ErpConnector implements ExternalConnector {
     @Override

@@ -1,4 +1,11 @@
-package com.main.kpiengine.controller;
+﻿package com.main.kpiengine.controller;
+
+/*
+ * KpiController - Controller REST.
+ * Responsibilities: Punto de entrada HTTP y validacion de requests.
+ * Patterns: MVC
+ */
+
 
 import com.main.kpiengine.dto.KpiSnapshotResponse;
 import com.main.kpiengine.dto.RecalculateKpiRequest;
@@ -18,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Controlador REST principal del motor KPI.
  *
- * <p>Expone operaciones de recálculo y consulta de snapshots para clientes
+ * <p>Expone operaciones de recÃ¡lculo y consulta de snapshots para clientes
  * internos (gateway/BFF u otros servicios).</p>
  */
 @RestController
@@ -33,10 +40,10 @@ public class KpiController {
     }
 
     /**
-     * Dispara recálculo de KPIs para una fuente y volumen afectados.
+     * Dispara recÃ¡lculo de KPIs para una fuente y volumen afectados.
      *
      * @param request payload validado con origen y cantidad de registros.
-     * @return respuesta con snapshots recién calculados.
+     * @return respuesta con snapshots reciÃ©n calculados.
      */
     @PostMapping("/recalculate")
     @Operation(summary = "Recalcular KPI", description = "Calcula snapshots de KPI para una fuente de datos afectada.")
@@ -45,7 +52,7 @@ public class KpiController {
     }
 
     /**
-     * Recupera los últimos snapshots calculados por el motor KPI.
+     * Recupera los Ãºltimos snapshots calculados por el motor KPI.
      *
      * @return lista ordenada de snapshots recientes.
      */

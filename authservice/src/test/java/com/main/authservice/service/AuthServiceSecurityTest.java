@@ -1,4 +1,11 @@
-package com.main.authservice.service;
+﻿package com.main.authservice.service;
+
+/*
+ * AuthServiceSecurityTest - Service.
+ * Responsibilities: Orquesta logica de negocio y reglas del dominio.
+ * Patterns: Service Layer
+ */
+
 
 import java.time.Instant;
 import java.util.Optional;

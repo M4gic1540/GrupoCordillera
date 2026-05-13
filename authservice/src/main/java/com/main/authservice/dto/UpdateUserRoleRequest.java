@@ -1,4 +1,11 @@
-package com.main.authservice.dto;
+﻿package com.main.authservice.dto;
+
+/*
+ * UpdateUserRoleRequest - DTO.
+ * Responsibilities: Contrato de datos para capa API.
+ * Patterns: DTO
+ */
+
 
 import com.main.authservice.model.Role;
 import jakarta.validation.constraints.NotNull;

@@ -1,4 +1,11 @@
-package com.main.kpiengine.integration;
+﻿package com.main.kpiengine.integration;
+
+/*
+ * KpiFlowRegressionIntegrationTest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

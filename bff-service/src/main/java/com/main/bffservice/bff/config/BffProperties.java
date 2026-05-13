@@ -1,21 +1,19 @@
+﻿package com.main.bffservice.bff.config;
 
-// Paquete config: define propiedades de configuración para BFF
-package com.main.gateway.bff.config;
+/*
+ * BffProperties - Config.
+ * Responsibilities: Configuracion de beans y propiedades externas.
+ * Patterns: Configuration, BFF
+ */
 
 
-// Permite mapear propiedades de config (application.yml) con prefijo bff
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-
-// Clase de propiedades para capa BFF
 @ConfigurationProperties(prefix = "bff")
 public class BffProperties {
 
-    // URL base de authservice
     private String authBaseUrl;
-    // URL base de data-ingestion-service
     private String ingestionBaseUrl;
-    // URL base de kpi-engine
     private String kpiBaseUrl;
 
     public String getAuthBaseUrl() {
@@ -42,3 +40,4 @@ public class BffProperties {
         this.kpiBaseUrl = kpiBaseUrl;
     }
 }
+

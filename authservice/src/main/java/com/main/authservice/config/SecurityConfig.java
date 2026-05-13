@@ -1,4 +1,11 @@
-package com.main.authservice.config;
+﻿package com.main.authservice.config;
+
+/*
+ * SecurityConfig - Config.
+ * Responsibilities: Configuracion de beans y propiedades externas.
+ * Patterns: Configuration
+ */
+
 
 import com.main.authservice.security.JwtAuthenticationFilter;
 import java.util.Arrays;

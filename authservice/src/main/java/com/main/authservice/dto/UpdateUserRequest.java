@@ -1,4 +1,11 @@
-package com.main.authservice.dto;
+﻿package com.main.authservice.dto;
+
+/*
+ * UpdateUserRequest - DTO.
+ * Responsibilities: Contrato de datos para capa API.
+ * Patterns: DTO
+ */
+
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;

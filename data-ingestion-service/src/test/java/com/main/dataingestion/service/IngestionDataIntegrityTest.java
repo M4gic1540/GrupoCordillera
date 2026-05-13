@@ -1,4 +1,11 @@
-package com.main.dataingestion.service;
+﻿package com.main.dataingestion.service;
+
+/*
+ * IngestionDataIntegrityTest - Service.
+ * Responsibilities: Orquesta logica de negocio y reglas del dominio.
+ * Patterns: Service Layer
+ */
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;

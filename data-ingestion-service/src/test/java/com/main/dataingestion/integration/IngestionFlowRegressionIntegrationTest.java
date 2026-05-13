@@ -1,4 +1,11 @@
-package com.main.dataingestion.integration;
+﻿package com.main.dataingestion.integration;
+
+/*
+ * IngestionFlowRegressionIntegrationTest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import java.time.OffsetDateTime;
 

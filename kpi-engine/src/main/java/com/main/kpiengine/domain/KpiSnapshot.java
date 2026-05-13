@@ -1,4 +1,11 @@
-package com.main.kpiengine.domain;
+﻿package com.main.kpiengine.domain;
+
+/*
+ * KpiSnapshot - Domain Model.
+ * Responsibilities: Entidad del dominio y mapeo de persistencia.
+ * Patterns: Domain Model
+ */
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,40 +23,40 @@ import java.time.OffsetDateTime;
 /**
  * Entidad de snapshot KPI calculado.
  *
- * <p>Representa el resultado puntual de un cálculo para una fuente específica,
- * enlazado a una definición KPI del catálogo.</p>
+ * <p>Representa el resultado puntual de un cÃ¡lculo para una fuente especÃ­fica,
+ * enlazado a una definiciÃ³n KPI del catÃ¡logo.</p>
  */
 @Entity
 @Table(name = "kpi_snapshots")
 public class KpiSnapshot {
 
-    /** Identificador técnico autogenerado del snapshot. */
+    /** Identificador tÃ©cnico autogenerado del snapshot. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Definición KPI asociada al valor calculado. */
+    /** DefiniciÃ³n KPI asociada al valor calculado. */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "kpi_id", nullable = false)
     private KpiDefinition definition;
 
-    /** Sistema origen que disparó el recálculo (ej: crm, erp). */
+    /** Sistema origen que disparÃ³ el recÃ¡lculo (ej: crm, erp). */
     @Column(nullable = false, length = 80)
     private String sourceSystem;
 
-    /** Volumen de registros considerados durante el cálculo. */
+    /** Volumen de registros considerados durante el cÃ¡lculo. */
     @Column(nullable = false)
     private Integer affectedRecords;
 
-    /** Valor numérico del KPI con precisión monetaria/analítica. */
+    /** Valor numÃ©rico del KPI con precisiÃ³n monetaria/analÃ­tica. */
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal value;
 
-    /** Fecha y hora exacta del cálculo del snapshot. */
+    /** Fecha y hora exacta del cÃ¡lculo del snapshot. */
     @Column(nullable = false)
     private OffsetDateTime computedAt;
 
-    /** Si no se setea fecha explícita, usa el instante actual al persistir. */
+    /** Si no se setea fecha explÃ­cita, usa el instante actual al persistir. */
     @PrePersist
     void onCreate() {
         if (this.computedAt == null) {
@@ -57,22 +64,22 @@ public class KpiSnapshot {
         }
     }
 
-    /** @return id técnico del snapshot. */
+    /** @return id tÃ©cnico del snapshot. */
     public Long getId() {
         return id;
     }
 
-    /** @return definición KPI asociada. */
+    /** @return definiciÃ³n KPI asociada. */
     public KpiDefinition getDefinition() {
         return definition;
     }
 
-    /** @param definition definición KPI asociada al snapshot. */
+    /** @param definition definiciÃ³n KPI asociada al snapshot. */
     public void setDefinition(KpiDefinition definition) {
         this.definition = definition;
     }
 
-    /** @return sistema fuente que originó el cálculo. */
+    /** @return sistema fuente que originÃ³ el cÃ¡lculo. */
     public String getSourceSystem() {
         return sourceSystem;
     }
@@ -82,12 +89,12 @@ public class KpiSnapshot {
         this.sourceSystem = sourceSystem;
     }
 
-    /** @return cantidad de registros usados en el cálculo. */
+    /** @return cantidad de registros usados en el cÃ¡lculo. */
     public Integer getAffectedRecords() {
         return affectedRecords;
     }
 
-    /** @param affectedRecords volumen de entrada para el recálculo. */
+    /** @param affectedRecords volumen de entrada para el recÃ¡lculo. */
     public void setAffectedRecords(Integer affectedRecords) {
         this.affectedRecords = affectedRecords;
     }
@@ -102,12 +109,12 @@ public class KpiSnapshot {
         this.value = value;
     }
 
-    /** @return timestamp de cómputo del snapshot. */
+    /** @return timestamp de cÃ³mputo del snapshot. */
     public OffsetDateTime getComputedAt() {
         return computedAt;
     }
 
-    /** @param computedAt fecha/hora explícita del cálculo. */
+    /** @param computedAt fecha/hora explÃ­cita del cÃ¡lculo. */
     public void setComputedAt(OffsetDateTime computedAt) {
         this.computedAt = computedAt;
     }

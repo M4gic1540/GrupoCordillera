@@ -1,4 +1,11 @@
-package com.main.kpiengine.domain;
+﻿package com.main.kpiengine.domain;
+
+/*
+ * KpiDefinition - Domain Model.
+ * Responsibilities: Entidad del dominio y mapeo de persistencia.
+ * Patterns: Domain Model
+ */
+
 
 import java.time.OffsetDateTime;
 
@@ -11,21 +18,21 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 /**
- * Entidad catálogo de KPI.
+ * Entidad catÃ¡logo de KPI.
  *
- * <p>Define metadatos estables de un indicador (código, nombre y frecuencia)
+ * <p>Define metadatos estables de un indicador (cÃ³digo, nombre y frecuencia)
  * que luego son referenciados por snapshots calculados.</p>
  */
 @Entity
 @Table(name = "kpi_definitions")
 public class KpiDefinition {
 
-    /** Identificador técnico autogenerado. */
+    /** Identificador tÃ©cnico autogenerado. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Código único de negocio del KPI (ej: INGEST_THROUGHPUT). */
+    /** CÃ³digo Ãºnico de negocio del KPI (ej: INGEST_THROUGHPUT). */
     @Column(nullable = false, unique = true, length = 40)
     private String code;
 
@@ -33,31 +40,31 @@ public class KpiDefinition {
     @Column(nullable = false, length = 120)
     private String name;
 
-    /** Frecuencia de actualización semántica del KPI. */
+    /** Frecuencia de actualizaciÃ³n semÃ¡ntica del KPI. */
     @Column(nullable = false, length = 20)
     private String frequency;
 
-    /** Fecha de creación de la definición, asignada una sola vez. */
+    /** Fecha de creaciÃ³n de la definiciÃ³n, asignada una sola vez. */
     @Column(nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
-    /** Inicializa timestamp de creación antes de persistir por primera vez. */
+    /** Inicializa timestamp de creaciÃ³n antes de persistir por primera vez. */
     @PrePersist
     void onCreate() {
         this.createdAt = OffsetDateTime.now();
     }
 
-    /** @return id técnico de la definición KPI. */
+    /** @return id tÃ©cnico de la definiciÃ³n KPI. */
     public Long getId() {
         return id;
     }
 
-    /** @return código funcional único del indicador. */
+    /** @return cÃ³digo funcional Ãºnico del indicador. */
     public String getCode() {
         return code;
     }
 
-    /** @param code código funcional único del indicador. */
+    /** @param code cÃ³digo funcional Ãºnico del indicador. */
     public void setCode(String code) {
         this.code = code;
     }
@@ -77,12 +84,12 @@ public class KpiDefinition {
         return frequency;
     }
 
-    /** @param frequency frecuencia de recálculo/actualización. */
+    /** @param frequency frecuencia de recÃ¡lculo/actualizaciÃ³n. */
     public void setFrequency(String frequency) {
         this.frequency = frequency;
     }
 
-    /** @return fecha de creación en base de datos. */
+    /** @return fecha de creaciÃ³n en base de datos. */
     public OffsetDateTime getCreatedAt() {
         return createdAt;
     }

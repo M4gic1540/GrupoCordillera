@@ -1,6 +1,13 @@
-
-// Paquete raíz gateway
+﻿
+// Paquete raÃ­z gateway
 package com.main.gateway;
+
+/*
+ * GatewayApplication - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 
 // Importa Spring Boot launcher

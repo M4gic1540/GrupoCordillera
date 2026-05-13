@@ -1,4 +1,11 @@
-package com.main.gateway.unit;
+﻿package com.main.gateway.unit;
+
+/*
+ * GatewayTestCasesSuiteTest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -54,7 +61,7 @@ class GatewayTestCasesSuiteTest {
                         "http://auth-service/validate/" + i));
     }
 
-    @ParameterizedTest(name = "Regla de inclusión/exclusión #{index}")
+    @ParameterizedTest(name = "Regla de inclusiÃ³n/exclusiÃ³n #{index}")
     @CsvSource({
             "/api/auth/login,false",
             "/api/auth/register,false",

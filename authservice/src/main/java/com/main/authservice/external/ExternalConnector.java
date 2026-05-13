@@ -1,7 +1,14 @@
-package com.main.authservice.external;
+﻿package com.main.authservice.external;
+
+/*
+ * ExternalConnector - Integration.
+ * Responsibilities: Abstraccion/implementacion de conectores externos.
+ * Patterns: Strategy
+ */
+
 
 public interface ExternalConnector {
     String getType();
     void connect();
-    // Puedes agregar métodos como fetchData(), sendData(), etc.
+    // Puedes agregar mÃ©todos como fetchData(), sendData(), etc.
 }

@@ -1,6 +1,13 @@
-
+﻿
 // Paquete security: define propiedades de seguridad para gateway
 package com.main.gateway.security;
+
+/*
+ * GatewaySecurityProperties - Security.
+ * Responsibilities: Autenticacion, autorizacion y validacion JWT.
+ * Patterns: Security Filter
+ */
+
 
 
 import java.util.ArrayList;
@@ -15,9 +22,9 @@ public class GatewaySecurityProperties {
 
     // URL para validar JWT (endpoint en authservice)
     private String authValidationUrl;
-    // Rutas protegidas: requieren autenticación
+    // Rutas protegidas: requieren autenticaciÃ³n
     private List<String> protectedPaths = new ArrayList<>();
-    // Rutas excluidas: no requieren autenticación
+    // Rutas excluidas: no requieren autenticaciÃ³n
     private List<String> excludedPaths = new ArrayList<>();
 
     public String getAuthValidationUrl() {

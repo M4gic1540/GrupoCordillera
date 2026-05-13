@@ -23,9 +23,9 @@ management:
 
 springdoc:
   swagger-ui:
-    path: /kpi/docs
+    path: /api/kpi/docs
   api-docs:
-    path: /kpi/openapi.json
+    path: /api/kpi/v3/api-docs
 
 logging:
   level:

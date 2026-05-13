@@ -1,4 +1,11 @@
-package com.main.kpiengine.service;
+﻿package com.main.kpiengine.service;
+
+/*
+ * KpiEngineServiceTest - Service.
+ * Responsibilities: Orquesta logica de negocio y reglas del dominio.
+ * Patterns: Service Layer
+ */
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

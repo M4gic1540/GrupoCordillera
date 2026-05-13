@@ -1,4 +1,11 @@
-package com.main.authservice.integration;
+﻿package com.main.authservice.integration;
+
+/*
+ * AuthServicePerformanceTest - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import java.util.ArrayList;
 import java.util.Comparator;

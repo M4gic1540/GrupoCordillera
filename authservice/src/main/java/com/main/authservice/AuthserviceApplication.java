@@ -1,4 +1,11 @@
-package com.main.authservice;
+﻿package com.main.authservice;
+
+/*
+ * AuthserviceApplication - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

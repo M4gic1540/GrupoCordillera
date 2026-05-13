@@ -1,4 +1,11 @@
-package com.main.gateway.testutil;
+﻿package com.main.gateway.testutil;
+
+/*
+ * GatewayHttpStubs - Componente.
+ * Responsibilities: Logica principal del modulo.
+ * Patterns: N/A
+ */
+
 
 import java.io.IOException;
 import java.io.OutputStream;

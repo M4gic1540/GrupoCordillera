@@ -1,4 +1,11 @@
-package com.main.authservice.external;
+﻿package com.main.authservice.external;
+
+/*
+ * ExternalIntegrationExample - Integration.
+ * Responsibilities: Abstraccion/implementacion de conectores externos.
+ * Patterns: Strategy
+ */
+
 
 public class ExternalIntegrationExample {
     public static void main(String[] args) {

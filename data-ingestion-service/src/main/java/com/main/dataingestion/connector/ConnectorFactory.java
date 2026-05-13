@@ -1,4 +1,11 @@
-package com.main.dataingestion.connector;
+﻿package com.main.dataingestion.connector;
+
+/*
+ * ConnectorFactory - Integration.
+ * Responsibilities: Abstraccion/implementacion de conectores externos.
+ * Patterns: Strategy, Factory Method
+ */
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +34,7 @@ public class ConnectorFactory {
      *
      * @param sourceKey clave configurada en application.yml (ej. crm, erp).
      * @return conector listo para consumir eventos.
-     * @throws IllegalArgumentException si la fuente no está registrada.
+     * @throws IllegalArgumentException si la fuente no estÃ¡ registrada.
      */
     public SourceConnector getConnector(String sourceKey) {
         SourceConnector connector = connectors.get(sourceKey);
